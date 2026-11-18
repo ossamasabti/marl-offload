@@ -1,0 +1,652 @@
+<title>MARL-Offload</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@600;700&display=swap">
+<style>
+/* Layout: a lab notebook — narrow reading column, tabbed sections, charts full column width */
+:root {
+  --bg: #f7f8fa;
+  --surface: #ffffff;
+  --ink: #12161c;
+  --ink-2: #4a525e;
+  --ink-3: #7a828e;
+  --rule: #dfe3ea;
+  --grid: #eceff3;
+  --accent: #2a78d6;
+  --accent-soft: #e6effb;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100;
+  --base: #8a919c; --base-soft: #c4c9d1;
+  --good: #1a7f4b; --good-bg: #e3f4ea;
+  --warn: #9a6200; --warn-bg: #fdf1d8;
+  --crit: #b3261e; --crit-bg: #fbe5e3;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-head: "IBM Plex Sans Condensed", "IBM Plex Sans", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111418; --surface: #181c22; --ink: #eef1f5; --ink-2: #b4bcc7; --ink-3: #8790a0;
+    --rule: #2b313a; --grid: #222830; --accent: #3987e5; --accent-soft: #1b2a3f;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
+    --base: #9aa2ad; --base-soft: #4b525c;
+    --good: #5cc98d; --good-bg: #16301f; --warn: #e3b04b; --warn-bg: #33280f; --crit: #f08a82; --crit-bg: #3a1a18;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111418; --surface: #181c22; --ink: #eef1f5; --ink-2: #b4bcc7; --ink-3: #8790a0;
+  --rule: #2b313a; --grid: #222830; --accent: #3987e5; --accent-soft: #1b2a3f;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
+  --base: #9aa2ad; --base-soft: #4b525c;
+  --good: #5cc98d; --good-bg: #16301f; --warn: #e3b04b; --warn-bg: #33280f; --crit: #f08a82; --crit-bg: #3a1a18;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.55; }
+.wrap { max-width: 920px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 28px 64px; }
+h1, h2, h3 { font-family: var(--f-head); text-wrap: balance; margin: 0; line-height: 1.15; }
+h1 { font-size: clamp(30px, 5vw, 42px); letter-spacing: -0.01em; }
+h2 { font-size: 22px; }
+h3 { font-size: 16px; }
+p { margin: 0; max-width: 68ch; }
+code, .mono { font-family: var(--f-mono); font-size: 0.88em; }
+code { background: var(--accent-soft); padding: 1px 5px; border-radius: 4px; }
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+.muted { color: var(--ink-2); }
+.small { font-size: 13px; }
+.stack { display: flex; flex-direction: column; gap: 14px; }
+.stack-lg { display: flex; flex-direction: column; gap: 36px; }
+
+header.top { display: flex; flex-direction: column; gap: 10px; padding-bottom: 22px; border-bottom: 1px solid var(--rule); }
+header.top p { color: var(--ink-2); font-size: 16px; }
+
+nav.tabs { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); display: flex; gap: 4px; overflow-x: auto; padding-block: 10px; border-bottom: 1px solid var(--rule); margin-bottom: 28px; scrollbar-width: thin; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+nav.tabs button { font: 500 14px var(--f-body); color: var(--ink-2); background: none; border: 1px solid transparent; border-radius: 6px; padding: 7px 12px; cursor: pointer; white-space: nowrap; }
+nav.tabs button:hover { color: var(--ink); background: var(--surface); }
+nav.tabs button[aria-selected="true"] { color: var(--accent); background: var(--accent-soft); }
+nav.tabs button:focus-visible, .seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+nav.tabs .count { font-family: var(--f-mono); font-size: 11px; margin-left: 6px; padding: 1px 6px; border-radius: 10px; background: var(--good-bg); color: var(--good); }
+
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+.kpi { background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; }
+.kpi .v { font-family: var(--f-head); font-size: 28px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.kpi .l { font-size: 13px; color: var(--ink-2); }
+
+.panel { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 18px 18px 14px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.panel-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px 16px; }
+.chart { position: relative; width: 100%; min-width: 0; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chart text { font-family: var(--f-body); font-size: 11px; fill: var(--ink-3); }
+.chart .lbl { fill: var(--ink-2); font-size: 11.5px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink-2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 14px; height: 3px; border-radius: 2px; display: inline-block; }
+.legend i.dash { background: repeating-linear-gradient(90deg, var(--c) 0 4px, transparent 4px 7px) !important; }
+.legend i.box { height: 10px; width: 10px; border-radius: 3px; }
+
+.tip { position: absolute; pointer-events: none; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 7px 9px; font-size: 12.5px; box-shadow: 0 4px 14px rgb(0 0 0 / 0.12); white-space: nowrap; z-index: 3; color: var(--ink); }
+.tip b { font-weight: 600; }
+.tip .row { display: flex; gap: 8px; align-items: center; justify-content: space-between; font-variant-numeric: tabular-nums; }
+.tip .row i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+
+.seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 7px; overflow: hidden; }
+.seg button { font: 500 12.5px var(--f-body); background: var(--surface); color: var(--ink-2); border: 0; padding: 5px 10px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--rule); }
+.seg button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); }
+
+.tbl-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; font-variant-numeric: tabular-nums; }
+th, td { text-align: right; padding: 7px 10px; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+th { font-weight: 600; color: var(--ink-2); font-size: 12px; }
+th:first-child, td:first-child { text-align: left; }
+tr.learned td:first-child { font-weight: 600; }
+tr.best td { background: var(--accent-soft); }
+
+.diagram { overflow-x: auto; }
+.diagram svg { min-width: 560px; width: 100%; height: auto; display: block; }
+.diagram text { font-family: var(--f-body); fill: var(--ink-2); font-size: 12px; }
+
+.actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.action { border-top: 3px solid var(--c); background: var(--surface); border-radius: 0 0 8px 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; border-left: 1px solid var(--rule); border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.action .formula { font-family: var(--f-mono); font-size: 12.5px; color: var(--ink-2); }
+
+.finding { background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 14px 16px; display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; }
+.finding .num { font-family: var(--f-mono); color: var(--ink-3); font-size: 13px; padding-top: 2px; }
+.finding .body { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.finding .ttl { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.finding .ttl h3 { font-family: var(--f-body); font-size: 15px; font-weight: 600; }
+.finding .files { font-family: var(--f-mono); font-size: 12px; color: var(--ink-3); overflow-wrap: anywhere; }
+.chip { font: 500 11.5px var(--f-mono); padding: 2px 8px; border-radius: 10px; display: inline-flex; align-items: center; gap: 5px; }
+.chip.fixed { background: var(--good-bg); color: var(--good); }
+.chip.doc { background: var(--warn-bg); color: var(--warn); }
+.chip.todo { background: var(--crit-bg); color: var(--crit); }
+.chip.sev { background: var(--grid); color: var(--ink-2); }
+.ba { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 13.5px; }
+.ba > div { background: var(--bg); border-radius: 6px; padding: 8px 10px; min-width: 0; }
+.ba .k { font-family: var(--f-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); }
+@media (max-width: 560px) { .ba { grid-template-columns: 1fr; } }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.callout { border-left: 3px solid var(--accent); padding: 4px 0 4px 14px; }
+footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--rule); font-size: 13px; color: var(--ink-3); display: flex; flex-direction: column; gap: 6px; }
+@media (prefers-reduced-motion: no-preference) { .chart path.line { transition: opacity .15s; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <span class="eyebrow">Research project · multi-agent RL · edge computing</span>
+    <h1>MARL-Offload</h1>
+    <p>Six heterogeneous devices share one edge server. Each one decides, task by task, whether to compute locally, on the edge or in the cloud. Can independent learners coordinate better than a myopic rule? And what price should the operator post?</p>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Sections">
+    <button role="tab" id="tab-apercu" data-view="apercu">Overview</button>
+    <button role="tab" id="tab-resultats" data-view="resultats">Results</button>
+    <button role="tab" id="tab-leader" data-view="leader">Leader–follower</button>
+    <button role="tab" id="tab-equilibre" data-view="equilibre">Equilibrium</button>
+    <button role="tab" id="tab-revue" data-view="revue">Review and fixes<span class="count" id="fix-count"></span></button>
+  </nav>
+
+  <!-- ============================================================ APERÇU -->
+  <section data-panel="apercu" class="stack-lg">
+    <div class="kpis" id="kpis"></div>
+
+    <div class="stack">
+      <h2>The game</h2>
+      <p class="muted">A general-sum Markov game: each device minimises its own cost <code>latency + energy + fee</code>. The devices are coupled through the shared edge queue, which persists from one time step to the next.</p>
+    </div>
+
+    <div class="panel">
+      <div class="diagram" id="diagram"></div>
+      <p class="small muted">Arrivals: 6 × 0.8 × 1.0 ≈ <b>4.8 units of work per step</b>. Edge capacity: <b>3</b>. The devices therefore have to share the server.</p>
+    </div>
+
+    <div class="actions">
+      <div class="action" style="--c: var(--s1)"><span class="eyebrow">Action 0</span><h3>Local</h3><span class="formula">(local queue + task) / f<sub>i</sub> + k·f<sub>i</sub>²·size</span><span class="small muted">Slow for weak CPUs, energy-hungry for fast CPUs.</span></div>
+      <div class="action" style="--c: var(--s2)"><span class="eyebrow">Action 1</span><h3>Edge</h3><span class="formula">upload + shared queue / 3 + price</span><span class="small muted">Fast when the queue is short. Everyone slows down if everyone goes there.</span></div>
+      <div class="action" style="--c: var(--s3)"><span class="eyebrow">Action 2</span><h3>Cloud</h3><span class="formula">upload + 1.5 + size / 10 + 0.3</span><span class="small muted">No congestion, but a long round trip and a fixed fee.</span></div>
+    </div>
+
+    <div class="stack">
+      <h2>What each device sees</h2>
+      <p class="muted">Its task, its local queue, its CPU speed, the state of its radio channel (a two-state Markov chain), the posted price, the time, and a public signal of the edge load that is <b><span id="delay"></span> steps old</b>. It never sees the other devices' decisions. The MAPPO critic also sees the full state and the true current load.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ RÉSULTATS -->
+  <section data-panel="resultats" class="stack-lg" hidden>
+    <div class="stack">
+      <h2>Cost per task</h2>
+      <p class="muted" id="res-lede"></p>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h3>Mean cost per task (lower is better)</h3><span class="small muted">100 evaluation episodes · error bars: 95 % CI over seeds</span></div>
+      <div class="chart" id="c-final"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h3>Learning curves</h3><span class="small muted">mean ± std over seeds</span></div>
+      <div class="legend" id="l-curves"></div>
+      <div class="chart" id="c-curves"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h3>Who uses the shared server?</h3><span class="small muted">share of tasks sent to the edge, per device</span></div>
+      <div class="legend" id="l-agents"></div>
+      <div class="chart" id="c-agents"></div>
+      <p class="small muted" id="agents-note"></p>
+    </div>
+
+    <div class="panel">
+      <h3>Full table</h3>
+      <div class="tbl-wrap"><table id="t-final"></table></div>
+    </div>
+  </section>
+
+  <!-- ============================================================ LEADER -->
+  <section data-panel="leader" class="stack-lg" hidden>
+    <div class="stack">
+      <h2>The operator sets a price</h2>
+      <p class="muted">The followers (one MAPPO policy) are trained with a random price drawn at each episode, so they learn a price-conditioned response. The operator then learns its price with a UCB1 bandit, observing only its own payoff <code>revenue − 0.5 × mean edge queue</code>.</p>
+    </div>
+    <div class="kpis" id="kpis-leader"></div>
+
+    <div class="filters">
+      <span class="small muted">Followers:</span>
+      <div class="seg" role="group" aria-label="Followers shown">
+        <button id="f-both" data-f="both" aria-pressed="true">Both</button>
+        <button id="f-learned" data-f="learned" aria-pressed="false">MAPPO</button>
+        <button id="f-greedy" data-f="greedy" aria-pressed="false">Greedy</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h3>Operator payoff</h3><span class="small muted">revenue − congestion, per step</span></div>
+      <div class="legend l-sweep"></div>
+      <div class="chart" id="c-payoff"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h3>Social cost per task</h3><span class="small muted">latency + energy + cloud fee · the edge price is a transfer and is excluded</span></div>
+      <div class="legend l-sweep"></div>
+      <div class="chart" id="c-social"></div>
+      <p class="small callout" id="social-note"></p>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h3>Share of tasks sent to the edge</h3></div>
+      <div class="legend l-sweep"></div>
+      <div class="chart" id="c-share"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h3>Prices played by the UCB bandit</h3><span class="small muted" id="bandit-sub"></span></div>
+      <div class="chart" id="c-bandit"></div>
+    </div>
+  </section>
+
+  <!-- ============================================================ ÉQUILIBRE -->
+  <section data-panel="equilibre" class="stack-lg" hidden>
+    <div class="stack">
+      <h2>Is it a Nash equilibrium?</h2>
+      <p class="muted">For each device, the other five are frozen on the joint policy and the device trains a best response with PPO. For learned policies, the best response starts from the device's current policy and fine-tunes it; for the rules, it starts from scratch and trains longer. The best checkpoint is selected on validation episodes, and the starting policy is one of the candidates. Before and after are evaluated on the same episodes. If no device gains by deviating, the policy is an equilibrium; the sum of the positive gains (NashConv) measures the distance to equilibrium. The best response is learned, so these gains are lower bounds.</p>
+      <p class="small muted" id="eq-method"></p>
+    </div>
+    <div class="kpis" id="kpis-eq"></div>
+    <div class="panel">
+      <div class="panel-head"><h3>Cost reduction from deviating</h3><span class="small muted">per device, in % of its starting cost</span></div>
+      <div class="legend" id="l-eq"></div>
+      <div class="chart" id="c-eq"></div>
+    </div>
+    <p class="muted" id="eq-note"></p>
+    <div class="panel">
+      <div class="panel-head"><h3>Per-device detail</h3><span class="small muted">cost per task before and after deviating · gain ± 95 % CI over paired episodes</span></div>
+      <div class="tbl-wrap"><table id="t-eq"></table></div>
+    </div>
+  </section>
+
+  <!-- ============================================================ REVUE -->
+  <section data-panel="revue" class="stack-lg" hidden>
+    <div class="stack">
+      <h2>Code review and fixes</h2>
+      <p class="muted">Each review finding, with what was changed and the measured effect. The "before" numbers come from the original results; the "after" numbers from the new run.</p>
+    </div>
+    <div class="filters">
+      <span class="small muted">Show:</span>
+      <div class="seg" role="group" aria-label="Filter findings">
+        <button id="r-all" data-r="all" aria-pressed="true">All</button>
+        <button id="r-fond" data-r="core" aria-pressed="false">Core</button>
+        <button id="r-modele" data-r="model" aria-pressed="false">Modelling</button>
+        <button id="r-code" data-r="code" aria-pressed="false">Engineering</button>
+      </div>
+    </div>
+    <div class="stack" id="findings"></div>
+  </section>
+
+  <footer>
+    <span>Ossama Sabti · ossamasabti.me</span>
+    <span>Generated from <code>results/*.json</code> by <code>scripts/report.py</code> · <span id="gen"></span></span>
+  </footer>
+</div>
+
+<div class="tip" id="tip" hidden></div>
+
+<script id="data" type="application/json">{"generated": "2026-11-18", "signal_delay": 2, "speeds": [0.6, 0.7, 0.8, 0.9, 1.0, 1.2], "final": {"all-local": {"cost_per_task": 4.3068402030457875, "latency_per_task": 3.912218232335522, "energy_per_task": 0.394621970710258, "social_cost_per_task": 4.3068402030457875, "revenue_per_step": 0.0, "mean_edge_backlog": 0.0, "share_local": 1.0, "share_edge": 0.0, "share_cloud": 0.0}, "all-edge": {"cost_per_task": 16.44506405225403, "latency_per_task": 16.266270399668844, "energy_per_task": 0.17879365258520724, "social_cost_per_task": 16.44506405225403, "revenue_per_step": 0.0, "mean_edge_backlog": 45.77317556130395, "share_local": 0.0, "share_edge": 1.0, "share_cloud": 0.0}, "all-cloud": {"cost_per_task": 2.6906489806677243, "latency_per_task": 2.2081852688968127, "energy_per_task": 0.1824637117709104, "social_cost_per_task": 2.6906489806677243, "revenue_per_step": 0.0, "mean_edge_backlog": 0.0, "share_local": 0.0, "share_edge": 0.0, "share_cloud": 1.0}, "random": {"cost_per_task": 1.927445400964641, "latency_per_task": 1.574198054896965, "energy_per_task": 0.2530265495337689, "social_cost_per_task": 1.927445400964641, "revenue_per_step": 0.0, "mean_edge_backlog": 0.11833615682756135, "share_local": 0.3328611898016997, "share_edge": 0.3330694884185969, "share_cloud": 0.3340693217797034}, "greedy": {"cost_per_task": 1.7016107019657245, "latency_per_task": 1.4343963990154287, "energy_per_task": 0.2651302763280008, "social_cost_per_task": 1.7016107019657245, "revenue_per_step": 0.0, "mean_edge_backlog": 1.5232595929334727, "share_local": 0.4562811980033278, "share_edge": 0.5367720465890183, "share_cloud": 0.00694675540765391}, "greedy+toll": {"cost_per_task": 1.483988184160373, "latency_per_task": 1.1903294837432197, "energy_per_task": 0.29208350351754025, "social_cost_per_task": 1.483988184160373, "revenue_per_step": 0.0, "mean_edge_backlog": 0.3682025536453865, "share_local": 0.6405384006334125, "share_edge": 0.354210943034546, "share_cloud": 0.005250656332041505, "toll": 0.8}, "IQL": {"cost_per_task": 1.529409631357178, "latency_per_task": 1.264948361354694, "energy_per_task": 0.2644437488307611, "social_cost_per_task": 1.529409631357178, "revenue_per_step": 0.0, "mean_edge_backlog": 1.0376280097051647, "share_local": 0.513554077929465, "share_edge": 0.48638751816480025, "share_cloud": 5.8403905734739925e-05, "cost_per_task_per_seed": [1.562451345810325, 1.5673690041022184, 1.475718724754598, 1.546397988411905, 1.495111093706843], "cost_per_task_ci95": 0.051562728828055494, "seeds": [0, 1, 2, 3, 4]}, "IPPO": {"cost_per_task": 1.4922012085832157, "latency_per_task": 1.2163410094329434, "energy_per_task": 0.27586019915027415, "social_cost_per_task": 1.4922012085832157, "revenue_per_step": 0.0, "mean_edge_backlog": 0.7892983975892867, "share_local": 0.5493346521674263, "share_edge": 0.4506653478325737, "share_cloud": 0.0, "cost_per_task_per_seed": [1.467596622463305, 1.494165345922211, 1.4949023013757052, 1.5021947096156105, 1.5021470635392478], "cost_per_task_ci95": 0.017749918911496288, "seeds": [0, 1, 2, 3, 4]}, "MAPPO": {"cost_per_task": 1.5256272290317319, "latency_per_task": 1.2549892930979785, "energy_per_task": 0.27063793593375196, "social_cost_per_task": 1.5256272290317319, "revenue_per_step": 0.0, "mean_edge_backlog": 0.9880466698681477, "share_local": 0.5255070527277264, "share_edge": 0.47449294727227354, "share_cloud": 0.0, "cost_per_task_per_seed": [1.4931737814174395, 1.5255851578492732, 1.529703251509282, 1.5654603506220262, 1.514213603760639], "cost_per_task_ci95": 0.032815721076064536, "seeds": [0, 1, 2, 3, 4]}}, "curves": {"IQL": [[300, 3.0276761469441253, 0.9049738383103949], [12300, 3.4557674844437307, 1.7295113257215995], [24300, 4.019559275382167, 3.801998234200437], [36300, 3.0035195450905694, 1.439401614533577], [48300, 2.3322685727293355, 0.6399597852617763], [60300, 1.9873469080276398, 0.19953535285958812], [72300, 2.0175141857360908, 0.1404690596221508], [84300, 1.6938883845092387, 0.09610173579656577], [96300, 1.752043796229851, 0.11847041868202002], [108300, 1.6566126391102807, 0.031643665815054685], [120300, 1.6433720026078262, 0.07128971192868526], [132300, 1.5828733195356182, 0.026405708697229725], [144300, 1.6271654305870134, 0.08561827566150647], [156300, 1.546481539430994, 0.05539878479067671], [168300, 1.5431845790606737, 0.04763958414041207], [180300, 1.532927987421264, 0.04254272001140569], [192300, 1.5832049810977646, 0.07697273296774708], [204300, 1.5120608461835896, 0.026190312100358413], [216300, 1.5426542787264337, 0.07103499087136535], [228300, 1.5019168692664795, 0.023765201252093023], [240300, 1.5067996711321605, 0.0330738465797456], [252300, 1.503087766653774, 0.02144940137669354], [264300, 1.5433149767955279, 0.08652393511633169], [276300, 1.5041738210713094, 0.03906939352966534], [288300, 1.5156846782638556, 0.016326970092512216], [300000, 1.526366117739946, 0.03354216871272395]], "IPPO": [[2400, 8.631559562461048, 5.579447523694841], [40800, 2.1106988037493006, 0.38064959435492574], [79200, 1.6397641700754158, 0.06278409106048727], [117600, 1.5843093912346002, 0.030586848238299925], [156000, 1.5762860252219846, 0.025834730019802465], [194400, 1.5959826656507468, 0.015579855626693782], [232800, 1.5767693440922712, 0.02714675201622634], [271200, 1.5764582803851621, 0.017679125531842428], [309600, 1.5643452649230123, 0.02360550668848914], [348000, 1.5604391817869914, 0.01952790216253666], [386400, 1.5451131375444576, 0.021220964438990835], [424800, 1.5413212131391614, 0.003968864531795137], [463200, 1.5362278443287523, 0.02133817972173009], [501600, 1.5214169820981496, 0.028587678689727943], [540000, 1.5228047147692976, 0.009192026011643348], [578400, 1.5003028926553894, 0.009245700518852313], [616800, 1.5147014057945372, 0.025630249194886035], [655200, 1.4979054593515966, 0.017298426845387245], [693600, 1.509877382533692, 0.017596590490620245], [732000, 1.5096515572985367, 0.023506919427504023], [770400, 1.4952097343931174, 0.018074610429834492], [808800, 1.4983638725392727, 0.02597204196108727], [847200, 1.5000345702754516, 0.01279133064593035], [885600, 1.4991205325639667, 0.018655402408368386], [924000, 1.5016910107944246, 0.015298637574554054], [960000, 1.4843895268576, 0.0198266944790898]], "MAPPO": [[2400, 10.253109769462853, 5.316759476828062], [40800, 2.017512720915496, 0.3101929140536809], [79200, 1.6627232324078327, 0.05452546264718691], [117600, 1.6499132569868038, 0.06962895550777956], [156000, 1.5954655814314522, 0.017262164749513694], [194400, 1.5973933441585888, 0.03377908732540641], [232800, 1.5823886486050838, 0.009145842044958441], [271200, 1.5670300896424025, 0.015506511348282594], [309600, 1.5658231150879094, 0.011091874151211056], [348000, 1.5489832011936489, 0.028047108590907987], [386400, 1.562951360566287, 0.023293037678326627], [424800, 1.5439489370155672, 0.02545752675481192], [463200, 1.5322347873716118, 0.02043328389826522], [501600, 1.531125965226379, 0.013052273445111355], [540000, 1.5358830579410916, 0.014356208985603736], [578400, 1.5252034336396032, 0.027362353352454964], [616800, 1.545704368837521, 0.014253268358118496], [655200, 1.5287657887065758, 0.025904053503162133], [693600, 1.5021717967339745, 0.01976951530632848], [732000, 1.5117569881995991, 0.02051160172456928], [770400, 1.498388350333548, 0.009414907251915985], [808800, 1.5229152731354778, 0.032858494722627835], [847200, 1.5137384179551399, 0.017811654909496346], [885600, 1.5190911281901915, 0.013041140370420003], [924000, 1.5071448095627686, 0.014664473294132098], [960000, 1.50389185312203, 0.020718218265360626]]}, "per_agent": {"greedy": [0.7362443210499747, 0.6676639242084268, 0.5059850374064838, 0.4697428139183056, 0.44385832705350414, 0.4182547642928786], "greedy+toll": [0.5365792759051186, 0.4459255533199195, 0.3382871536523929, 0.2878293601003764, 0.25081270317579396, 0.256797583081571], "IQL": [0.6715808347444965, 0.5857049312446482, 0.4863574694738958, 0.42144538488506034, 0.37760128682014676, 0.3600981767180926], "MAPPO": [0.6471767122601333, 0.611987540192926, 0.5176037049947712, 0.4431767001951659, 0.3647735297084636, 0.28237823782378235]}, "stackelberg": {"sweep": {"price": [0.0, 0.2, 0.4, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0, 2.2, 2.4, 2.6, 2.8, 3.0], "learned": [{"cost_per_task": 1.5358981910185068, "latency_per_task": 1.254609946116561, "energy_per_task": 0.28128824490194443, "social_cost_per_task": 1.5358981910185068, "revenue_per_step": 0.0, "mean_edge_backlog": 1.1019985218478852, "share_local": 0.5391113892365457, "share_edge": 0.46088861076345433, "share_cloud": 0.0, "leader_payoff": -0.5509992609239426}, {"cost_per_task": 1.5639313150122032, "latency_per_task": 1.1907171670145995, "energy_per_task": 0.2887776542587794, "social_cost_per_task": 1.4794948212733838, "revenue_per_step": 0.4011999999999998, "mean_edge_backlog": 0.7282519597633271, "share_local": 0.5778175313059034, "share_edge": 0.4221824686940966, "share_cloud": 0.0, "leader_payoff": 0.037074020118336215}, {"cost_per_task": 1.6100633753509361, "latency_per_task": 1.1571020667491916, "energy_per_task": 0.29688809728726906, "social_cost_per_task": 1.4539901640364603, "revenue_per_step": 0.7504000000000002, "mean_edge_backlog": 0.5543430056563905, "share_local": 0.6098169717138103, "share_edge": 0.39018302828618967, "share_cloud": 0.0, "leader_payoff": 0.47322849717180493}, {"cost_per_task": 1.6552442157544183, "latency_per_task": 1.1374262482574904, "energy_per_task": 0.30538858896585913, "social_cost_per_task": 1.442814837223346, "revenue_per_step": 1.0151999999999943, "mean_edge_backlog": 0.3816500044266526, "share_local": 0.6459510357815442, "share_edge": 0.3540489642184557, "share_cloud": 0.0, "leader_payoff": 0.824374997786668}, {"cost_per_task": 1.705994609695009, "latency_per_task": 1.1329900175510945, "energy_per_task": 0.3195384236092509, "social_cost_per_task": 1.4525284411603483, "revenue_per_step": 1.221199999999994, "mean_edge_backlog": 0.24792760987198967, "share_local": 0.6831672893316729, "share_edge": 0.31683271066832713, "share_cloud": 0.0, "leader_payoff": 1.0972361950639993}, {"cost_per_task": 1.7451862233523874, "latency_per_task": 1.1320435730234464, "energy_per_task": 0.3287037424082547, "social_cost_per_task": 1.4607473154316981, "revenue_per_step": 1.37, "mean_edge_backlog": 0.16917496561451564, "share_local": 0.7155610920793107, "share_edge": 0.2844389079206893, "share_cloud": 0.0, "leader_payoff": 1.2854125171927422}, {"cost_per_task": 1.7809560892001683, "latency_per_task": 1.1414011523392127, "energy_per_task": 0.3408999478087248, "social_cost_per_task": 1.482301100147932, "revenue_per_step": 1.4321999999999986, "mean_edge_backlog": 0.0869763816026289, "share_local": 0.7511208424564696, "share_edge": 0.2488791575435304, "share_cloud": 0.0, "leader_payoff": 1.388711809198684}, {"cost_per_task": 1.8109329836641643, "latency_per_task": 1.1919458946563726, "energy_per_task": 0.35127310153389, "social_cost_per_task": 1.5548995807414046, "revenue_per_step": 1.2264000000000195, "mean_edge_backlog": 0.03637411208242997, "share_local": 0.7781837160751566, "share_edge": 0.18288100208768268, "share_cloud": 0.03893528183716075, "leader_payoff": 1.2082129439588045}, {"cost_per_task": 1.8160107378172559, "latency_per_task": 1.3520132742991608, "energy_per_task": 0.35920443519565287, "social_cost_per_task": 1.763723156117909, "revenue_per_step": 0.2520000000000011, "mean_edge_backlog": 0.00024541326307205935, "share_local": 0.7923021060275962, "share_edge": 0.032679738562091505, "share_cloud": 0.17501815541031226, "leader_payoff": 0.2518772933684651}, {"cost_per_task": 1.8137303345564113, "latency_per_task": 1.3922258646839647, "energy_per_task": 0.3582040028252247, "social_cost_per_task": 1.8137303345564113, "revenue_per_step": 0.0, "mean_edge_backlog": 0.0, "share_local": 0.7889984431759212, "share_edge": 0.0, "share_cloud": 0.21100155682407887, "leader_payoff": 0.0}, {"cost_per_task": 1.8126186807007048, "latency_per_task": 1.3912389604911177, "energy_per_task": 0.35711402223345995, "social_cost_per_task": 1.8126186807007048, "revenue_per_step": 0.0, "mean_edge_backlog": 0.0, "share_local": 0.7857810067462376, "share_edge": 0.0, "share_cloud": 0.2142189932537623, "leader_payoff": 0.0}, {"cost_per_task": 1.812130753095584, "latency_per_task": 1.3907011952111377, "energy_per_task": 0.3565411302767681, "social_cost_per_task": 1.812130753095584, "revenue_per_step": 0.0, "mean_edge_backlog": 0.0, "share_local": 0.7837052413077322, "share_edge": 0.0, "share_cloud": 0.21629475869226777, "leader_payoff": 0.0}, {"cost_per_task": 1.812937097038435, "latency_per_task": 1.391279092306264, "energy_per_task": 0.3556175273061228, "social_cost_per_task": 1.812937097038435, "revenue_per_step": 0.0, "mean_edge_backlog": 0.0, "share_local": 0.7798650752464972, "share_edge": 0.0, "share_cloud": 0.22013492475350285, "leader_payoff": 0.0}, {"cost_per_task": 1.8129904485552786, "latency_per_task": 1.3913226863799961, "energy_per_task": 0.3547865997466381, "social_cost_per_task": 1.8129904485552786, "revenue_per_step": 0.0, "mean_edge_backlog": 0.0, "share_local": 0.7770627919045148, "share_edge": 0.0, "share_cloud": 0.2229372080954852, "leader_payoff": 0.0}, {"cost_per_task": 1.8130884192056775, "latency_per_task": 1.3912310247359412, "energy_per_task": 0.3540110011121861, "social_cost_per_task": 1.8130884192056775, "revenue_per_step": 0.0, "mean_edge_backlog": 0.0, "share_local": 0.7738453554748314, "share_edge": 0.0, "share_cloud": 0.22615464452516865, "leader_payoff": 0.0}, {"cost_per_task": 1.8130493175256048, "latency_per_task": 1.3910923575445715, "energy_per_task": 0.35320760865773315, "social_cost_per_task": 1.8130493175256048, "revenue_per_step": 0.0, "mean_edge_backlog": 0.0, "share_local": 0.7708354955889984, "share_edge": 0.0, "share_cloud": 0.22916450441100156, "leader_payoff": 0.0}], "greedy": [{"cost_per_task": 1.6984979848498865, "latency_per_task": 1.4315322380651931, "energy_per_task": 0.26486784468678776, "social_cost_per_task": 1.6984979848498865, "revenue_per_step": 0.0, "mean_edge_backlog": 1.5014179127460947, "share_local": 0.452875482726229, "share_edge": 0.540131510280764, "share_cloud": 0.006993006993006993, "leader_payoff": -0.7507089563730474}, {"cost_per_task": 1.6821553096021673, "latency_per_task": 1.318075355209111, "energy_per_task": 0.26111318638802566, "social_cost_per_task": 1.580761033472594, "revenue_per_step": 0.48360000000000036, "mean_edge_backlog": 1.086771896571779, "share_local": 0.4877869797672712, "share_edge": 0.5069713806478666, "share_cloud": 0.005241639584862145, "leader_payoff": -0.05978594828588912}, {"cost_per_task": 1.7311528231487325, "latency_per_task": 1.2746956037933308, "energy_per_task": 0.26298032201063914, "social_cost_per_task": 1.5394321457496103, "revenue_per_step": 0.9170000000000016, "mean_edge_backlog": 0.8129852504242189, "share_local": 0.5148442400167259, "share_edge": 0.4793016934978047, "share_cloud": 0.005854066485469371, "leader_payoff": 0.5105073747878921}, {"cost_per_task": 1.7558298642060817, "latency_per_task": 1.222307476302871, "energy_per_task": 0.27197667631037725, "social_cost_per_task": 1.4966404202852532, "revenue_per_step": 1.2374999999999954, "mean_edge_backlog": 0.6388416938546704, "share_local": 0.5601633678919259, "share_edge": 0.4319824065347157, "share_cloud": 0.007854225573358466, "leader_payoff": 0.9180791530726602}, {"cost_per_task": 1.7682034492491954, "latency_per_task": 1.191017150735658, "energy_per_task": 0.29301573169086625, "social_cost_per_task": 1.4858113535653676, "revenue_per_step": 1.3576000000000015, "mean_edge_backlog": 0.3700925953233601, "share_local": 0.6410816432657306, "share_edge": 0.3529901196047842, "share_cloud": 0.00592823712948518, "leader_payoff": 1.1725537023383215}, {"cost_per_task": 1.7700976660048495, "latency_per_task": 1.179109848351564, "energy_per_task": 0.31564592392742585, "social_cost_per_task": 1.495538735009965, "revenue_per_step": 1.315, "mean_edge_backlog": 0.16435830226591053, "share_local": 0.722831193235202, "share_edge": 0.27455893099488465, "share_cloud": 0.002609875769913352, "leader_payoff": 1.2328208488670447}, {"cost_per_task": 1.8031936564336501, "latency_per_task": 1.2096599195164006, "energy_per_task": 0.34317581597109587, "social_cost_per_task": 1.5534582066981986, "revenue_per_step": 1.2036000000000096, "mean_edge_backlog": 0.048155737244646, "share_local": 0.7898122211847702, "share_edge": 0.20811287477954143, "share_cloud": 0.0020749040356883492, "leader_payoff": 1.1795221313776865}, {"cost_per_task": 1.8563670043619274, "latency_per_task": 1.2748394432246588, "energy_per_task": 0.365809262999332, "social_cost_per_task": 1.6411168223167778, "revenue_per_step": 1.034600000000011, "mean_edge_backlog": 0.010168862306741234, "share_local": 0.8446894829917819, "share_edge": 0.153750130032248, "share_cloud": 0.0015603869759700407, "leader_payoff": 1.0295155688466404}, {"cost_per_task": 1.8901135599984522, "latency_per_task": 1.4494862133991, "energy_per_task": 0.3739918422885582, "social_cost_per_task": 1.8575385106580555, "revenue_per_step": 0.15680000000000005, "mean_edge_backlog": 0.0, "share_local": 0.8661057442609328, "share_edge": 0.020359405837748, "share_cloud": 0.11353484990131921, "leader_payoff": 0.15680000000000005}, {"cost_per_task": 1.89628255937102, "latency_per_task": 1.4819863457343434, "energy_per_task": 0.3746283361068374, "social_cost_per_task": 1.89628255937102, "revenue_per_step": 0.0, "mean_edge_backlog": 0.0, "share_local": 0.8677737415672029, "share_edge": 0.0, "share_cloud": 0.1322262584327971, "leader_payoff": 0.0}, {"cost_per_task": 1.89628255937102, "latency_per_task": 1.4819863457343434, "energy_per_task": 0.3746283361068374, "social_cost_per_task": 1.89628255937102, "revenue_per_step": 0.0, "mean_edge_backlog": 0.0, "share_local": 0.8677737415672029, "share_edge": 0.0, "share_cloud": 0.1322262584327971, "leader_payoff": 0.0}, {"cost_per_task": 1.89628255937102, "latency_per_task": 1.4819863457343434, "energy_per_task": 0.3746283361068374, "social_cost_per_task": 1.89628255937102, "revenue_per_step": 0.0, "mean_edge_backlog": 0.0, "share_local": 0.8677737415672029, "share_edge": 0.0, "share_cloud": 0.1322262584327971, "leader_payoff": 0.0}, {"cost_per_task": 1.89628255937102, "latency_per_task": 1.4819863457343434, "energy_per_task": 0.3746283361068374, "social_cost_per_task": 1.89628255937102, "revenue_per_step": 0.0, "mean_edge_backlog": 0.0, "share_local": 0.8677737415672029, "share_edge": 0.0, "share_cloud": 0.1322262584327971, "leader_payoff": 0.0}, {"cost_per_task": 1.89628255937102, "latency_per_task": 1.4819863457343434, "energy_per_task": 0.3746283361068374, "social_cost_per_task": 1.89628255937102, "revenue_per_step": 0.0, "mean_edge_backlog": 0.0, "share_local": 0.8677737415672029, "share_edge": 0.0, "share_cloud": 0.1322262584327971, "leader_payoff": 0.0}, {"cost_per_task": 1.89628255937102, "latency_per_task": 1.4819863457343434, "energy_per_task": 0.3746283361068374, "social_cost_per_task": 1.89628255937102, "revenue_per_step": 0.0, "mean_edge_backlog": 0.0, "share_local": 0.8677737415672029, "share_edge": 0.0, "share_cloud": 0.1322262584327971, "leader_payoff": 0.0}, {"cost_per_task": 1.89628255937102, "latency_per_task": 1.4819863457343434, "energy_per_task": 0.3746283361068374, "social_cost_per_task": 1.89628255937102, "revenue_per_step": 0.0, "mean_edge_backlog": 0.0, "share_local": 0.8677737415672029, "share_edge": 0.0, "share_cloud": 0.1322262584327971, "leader_payoff": 0.0}]}, "bandit_choices": [0.0, 0.2, 0.4, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0, 2.2, 2.4, 2.6, 2.8, 3.0, 1.2, 0.8, 1.4, 1.0, 0.6, 0.4, 1.2, 1.0, 0.8, 1.4, 1.6, 0.2, 1.2, 1.0, 0.6, 1.8, 2.0, 2.2, 2.4, 2.6, 2.8, 3.0, 1.2, 0.8, 1.0, 1.4, 1.2, 1.4, 1.0, 0.8, 0.4, 1.2, 0.6, 1.0, 1.4, 1.2, 1.4, 1.0, 0.8, 1.2, 1.0, 1.4, 1.0, 1.2, 0.6, 1.6, 0.8, 1.0, 1.2, 1.4, 0.4, 1.0, 1.2, 1.4, 0.8, 0.6, 1.2, 1.0, 1.4, 0.8, 1.4, 1.0, 1.2, 1.2, 1.4, 1.8, 2.0, 2.2, 2.4, 2.6, 2.8, 3.0, 1.2, 1.0, 1.4, 0.0, 1.2, 0.6, 0.8, 0.4, 0.2, 1.4, 1.0, 1.2, 1.4, 1.0, 1.2, 0.8, 1.2, 1.4, 1.0, 1.0, 0.6, 1.6, 1.2, 1.4, 0.8, 1.0, 1.2, 1.0, 1.2, 1.4, 0.8, 1.0, 1.2, 1.0, 1.2, 1.2, 1.0, 0.8, 1.0, 1.4, 0.4, 1.2, 0.6, 1.2, 1.4, 0.8, 1.2, 1.0, 1.0, 1.2, 1.2, 1.0, 1.2, 0.8, 1.4, 1.2, 1.2, 0.6, 1.0, 1.2, 1.0, 1.4, 1.0, 1.2, 1.0, 1.2, 0.8, 1.2, 1.0, 1.2, 1.4, 1.2, 1.0, 1.4, 1.4, 1.2, 0.8, 0.4, 1.4, 1.2, 0.6, 1.2, 1.0, 1.2, 1.2, 1.8, 2.0, 2.2, 2.4, 2.6, 2.8, 3.0, 1.4, 1.2, 1.0, 1.6, 1.2, 0.8, 0.2, 1.0, 1.2, 1.2, 1.4, 1.2, 1.0, 1.2, 1.2, 1.2, 1.0, 0.8, 0.6, 1.4, 1.0, 1.2, 1.0, 1.2, 1.4, 1.0, 0.8, 1.4, 1.2, 1.0, 0.6, 0.8, 1.2, 1.0, 1.2, 1.4, 1.0, 1.0, 1.2, 1.0, 1.2, 1.0, 0.8, 1.2, 1.0, 1.2, 1.0, 1.4, 1.0, 1.0, 1.2, 1.2, 0.8, 1.0, 1.2, 1.4, 1.2, 1.2, 1.2, 1.2, 0.6, 1.0, 0.4, 1.2, 1.4, 0.8, 1.2, 1.0, 1.2, 1.0, 1.4, 1.2, 0.8, 1.0, 1.4, 1.2, 1.2, 1.2, 1.2, 0.8, 1.0, 1.2, 1.2, 1.2, 1.0, 1.0, 0.6, 1.4, 1.4, 1.4, 1.4, 1.4, 1.4, 1.6, 1.2, 1.2, 1.0, 1.4, 1.2, 0.8, 1.0, 1.2, 1.2, 1.0, 1.0, 1.2, 1.2, 1.2, 1.0, 0.8, 1.2, 1.0, 0.2, 1.4, 1.4, 1.2, 1.2, 1.0, 1.2, 1.2, 1.0, 1.4, 1.2, 0.6, 1.4, 1.4, 1.0, 1.4, 1.0, 0.8, 1.2, 1.0, 0.4, 1.2, 1.4, 1.2, 1.0, 0.8, 1.2, 1.2, 1.2, 1.8, 2.0, 2.2, 2.4, 2.6, 2.8, 3.0, 1.4, 1.2, 1.0, 0.8, 1.2, 1.0, 1.4, 1.2, 1.2, 1.0, 1.2, 1.0, 0.6, 0.8, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 0.0, 1.2, 1.0, 1.2, 1.2, 1.2, 1.4, 1.4, 1.4, 1.2, 1.0, 1.2, 1.0, 1.2, 1.2, 1.2, 1.4, 1.2, 1.2, 1.2, 0.8, 1.0, 1.2, 1.2, 1.2, 1.2, 1.0, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.4, 1.2, 1.2, 1.2, 1.2, 1.0, 1.2, 0.8, 1.4, 1.2, 1.2, 1.2, 1.2, 0.6, 1.2, 1.2, 1.4, 1.2, 1.0, 1.2, 1.2, 1.2, 1.2, 1.2, 1.0, 1.2, 0.8, 1.2, 1.4, 1.4, 1.4, 1.4, 1.0, 1.0, 1.0, 1.2, 1.0, 1.2, 1.0, 1.2, 1.4, 1.4, 0.8, 1.2, 1.0, 1.4, 1.4, 1.6, 1.2, 1.2, 1.2, 1.2, 1.0, 1.4, 0.6, 1.2, 0.8, 1.2, 1.2, 1.2, 1.0, 1.2, 1.0, 1.0, 1.2, 1.2, 1.2, 1.2, 1.2, 0.4, 1.0, 1.4, 1.2, 1.2, 1.0, 1.2, 1.2, 1.2, 0.8, 1.2, 1.2, 1.4, 1.0, 1.4, 1.2, 1.0, 0.2, 1.2, 1.2, 1.0, 0.6, 1.2, 1.4, 1.4, 1.0, 1.2, 1.2, 1.2, 1.2, 0.8, 1.0, 1.2, 1.2, 1.2, 1.2, 1.4, 1.2, 0.8, 1.0, 1.2, 1.0, 1.4, 1.2, 1.4, 1.2, 1.2, 1.4, 1.4, 1.4, 1.4, 1.2, 0.6, 1.0, 0.8, 1.2, 1.2, 1.0, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.0, 1.2, 1.2, 1.2, 1.0, 1.2, 1.4, 1.2, 1.4, 1.4, 1.0, 1.2, 1.0, 1.2, 0.8, 1.2, 1.2, 1.2, 1.2, 1.2, 1.0, 1.2, 1.2, 1.2, 0.8, 1.2, 1.4, 1.2, 1.0, 1.2, 1.2, 1.0, 0.6, 1.2, 1.0, 1.4, 1.4, 1.4, 1.4, 1.2, 1.2, 1.2, 1.2, 1.2, 1.0, 1.2, 1.0, 0.8, 1.2, 1.2, 1.2, 1.0, 1.4, 1.2, 1.2, 1.4, 1.4, 1.4, 1.2, 1.2, 1.0, 0.4, 1.2, 1.2, 1.2, 1.0, 1.0, 1.2, 0.8, 1.2, 1.4, 1.2, 1.2, 1.2, 1.2, 1.0, 1.0, 1.2, 1.2], "summary": {"bandit_price": 1.2, "sweep_optimal_price": 1.2, "bandit_share_of_plays": 0.42333333333333334, "device_optimal_price": 0.0, "social_optimal_price": 0.6, "social_optimal_price_greedy": 0.8, "congestion_weight": 0.5}}, "exploitability": {"IPPO": {"seeds": [0], "nash_conv": 0.041356000702838694, "nash_conv_per_seed": [0.041356000702838694], "nash_conv_raw": 0.04019485079628458, "mean_relative_gain": 0.0047707855010491905, "not_converged": {"0": []}, "per_agent": [{"agent": 0, "cpu": 0.6, "cost_before": 1.570724026726962, "cost_after": 1.5718851766335162, "gain": -0.0011611499065541167, "gain_ci95": 0.025867736261117606, "gain_per_seed": [-0.0011611499065541167], "converged_all_seeds": true}, {"agent": 1, "cpu": 0.7, "cost_before": 1.5050207996183043, "cost_after": 1.5027726198546882, "gain": 0.002248179763615951, "gain_ci95": 0.021088363470115782, "gain_per_seed": [0.002248179763615951], "converged_all_seeds": true}, {"agent": 2, "cpu": 0.8, "cost_before": 1.459113888173949, "cost_after": 1.4472564637998708, "gain": 0.011857424374078291, "gain_ci95": 0.016561618497234285, "gain_per_seed": [0.011857424374078291], "converged_all_seeds": true}, {"agent": 3, "cpu": 0.9, "cost_before": 1.4349322085976244, "cost_after": 1.4303727115625144, "gain": 0.004559497035109966, "gain_ci95": 0.018530534411216295, "gain_per_seed": [0.004559497035109966], "converged_all_seeds": true}, {"agent": 4, "cpu": 1.0, "cost_before": 1.4281646468146134, "cost_after": 1.423804441227731, "gain": 0.004360205586882119, "gain_ci95": 0.01687719356466208, "gain_per_seed": [0.004360205586882119], "converged_all_seeds": true}, {"agent": 5, "cpu": 1.2, "cost_before": 1.4350050728292048, "cost_after": 1.4166743788860523, "gain": 0.018330693943152364, "gain_ci95": 0.013247952126030634, "gain_per_seed": [0.018330693943152364], "converged_all_seeds": true}], "eval_episodes": 300, "updates": 150, "warm_start": true}, "IQL": {"seeds": [0], "nash_conv": 0.03656193833563526, "nash_conv_per_seed": [0.03656193833563526], "nash_conv_raw": 0.03527589768845789, "mean_relative_gain": 0.003975553775725701, "not_converged": {"0": [0, 1, 2]}, "per_agent": [{"agent": 0, "cpu": 0.6, "cost_before": 1.7005126378675468, "cost_after": 1.7017986785147243, "gain": -0.0012860406471773718, "gain_ci95": 0.026969332922460485, "gain_per_seed": [-0.0012860406471773718], "converged_all_seeds": false}, {"agent": 1, "cpu": 0.7, "cost_before": 1.634284602168827, "cost_after": 1.6299271933283825, "gain": 0.004357408840444523, "gain_ci95": 0.0204715869907638, "gain_per_seed": [0.004357408840444523], "converged_all_seeds": false}, {"agent": 2, "cpu": 0.8, "cost_before": 1.572832561684965, "cost_after": 1.572832561684965, "gain": 0.0, "gain_ci95": 0.0, "gain_per_seed": [0.0], "converged_all_seeds": false}, {"agent": 3, "cpu": 0.9, "cost_before": 1.536505283843349, "cost_after": 1.5313048387565042, "gain": 0.005200445086844973, "gain_ci95": 0.018086628061029696, "gain_per_seed": [0.005200445086844973], "converged_all_seeds": true}, {"agent": 4, "cpu": 1.0, "cost_before": 1.5168719576526433, "cost_after": 1.4898678732442976, "gain": 0.027004084408345765, "gain_ci95": 0.01621776973430316, "gain_per_seed": [0.027004084408345765], "converged_all_seeds": true}, {"agent": 5, "cpu": 1.2, "cost_before": 1.4947890379666775, "cost_after": 1.4947890379666775, "gain": 0.0, "gain_ci95": 0.0, "gain_per_seed": [0.0], "converged_all_seeds": true}], "eval_episodes": 300, "updates": 150, "warm_start": true}, "MAPPO": {"seeds": [0], "nash_conv": 0.016813365648362624, "nash_conv_per_seed": [0.016813365648362624], "nash_conv_raw": -0.010748551959069267, "mean_relative_gain": 0.0017252002618171464, "not_converged": {"0": [1, 2, 3, 5]}, "per_agent": [{"agent": 0, "cpu": 0.6, "cost_before": 1.6260507175471761, "cost_after": 1.6093817543489721, "gain": 0.016668963198203882, "gain_ci95": 0.023604563083328166, "gain_per_seed": [0.016668963198203882], "converged_all_seeds": true}, {"agent": 1, "cpu": 0.7, "cost_before": 1.54055001320344, "cost_after": 1.5508857902874909, "gain": -0.010335777084051022, "gain_ci95": 0.018739798152441582, "gain_per_seed": [-0.010335777084051022], "converged_all_seeds": false}, {"agent": 2, "cpu": 0.8, "cost_before": 1.474244264786148, "cost_after": 1.4858997934218947, "gain": -0.011655528635746712, "gain_ci95": 0.012730918471333168, "gain_per_seed": [-0.011655528635746712], "converged_all_seeds": false}, {"agent": 3, "cpu": 0.9, "cost_before": 1.4527665113736217, "cost_after": 1.458337123261256, "gain": -0.0055706118876341585, "gain_ci95": 0.014526581770775692, "gain_per_seed": [-0.0055706118876341585], "converged_all_seeds": false}, {"agent": 4, "cpu": 1.0, "cost_before": 1.4511603343797765, "cost_after": 1.4511603343797765, "gain": 0.0, "gain_ci95": 0.0, "gain_per_seed": [0.0], "converged_all_seeds": true}, {"agent": 5, "cpu": 1.2, "cost_before": 1.443931511360391, "cost_after": 1.4437871089102323, "gain": 0.0001444024501587434, "gain_ci95": 0.010014187063872826, "gain_per_seed": [0.0001444024501587434], "converged_all_seeds": false}], "eval_episodes": 300, "updates": 150, "warm_start": true}, "greedy+toll": {"seeds": [0], "nash_conv": 0.5069580107590307, "nash_conv_per_seed": [0.5069580107590307], "nash_conv_raw": 0.5069580107590307, "mean_relative_gain": 0.0568113372434664, "not_converged": {"0": []}, "per_agent": [{"agent": 0, "cpu": 0.6, "cost_before": 1.5647024035484314, "cost_after": 1.524234406414517, "gain": 0.04046799713391452, "gain_ci95": 0.030198477784111114, "gain_per_seed": [0.04046799713391452], "converged_all_seeds": true}, {"agent": 1, "cpu": 0.7, "cost_before": 1.5434236852956353, "cost_after": 1.412101590297266, "gain": 0.13132209499836922, "gain_ci95": 0.02894229357380647, "gain_per_seed": [0.13132209499836922], "converged_all_seeds": true}, {"agent": 2, "cpu": 0.8, "cost_before": 1.508420357112885, "cost_after": 1.3838068169708047, "gain": 0.12461354014208012, "gain_ci95": 0.018234659998643887, "gain_per_seed": [0.12461354014208012], "converged_all_seeds": true}, {"agent": 3, "cpu": 0.9, "cost_before": 1.4559833534261233, "cost_after": 1.3727322740197052, "gain": 0.08325107940641786, "gain_ci95": 0.019056250389326537, "gain_per_seed": [0.08325107940641786], "converged_all_seeds": true}, {"agent": 4, "cpu": 1.0, "cost_before": 1.4331077693946428, "cost_after": 1.3715119489761605, "gain": 0.061595820418482425, "gain_ci95": 0.019990057421296555, "gain_per_seed": [0.061595820418482425], "converged_all_seeds": true}, {"agent": 5, "cpu": 1.2, "cost_before": 1.3936163434419633, "cost_after": 1.3279088647821966, "gain": 0.06570747865976653, "gain_ci95": 0.01317781195692526, "gain_per_seed": [0.06570747865976653], "converged_all_seeds": true}], "eval_episodes": 300, "updates": 300, "warm_start": false}, "greedy": {"seeds": [0], "nash_conv": 0.3994411464270299, "nash_conv_per_seed": [0.3994411464270299], "nash_conv_raw": 0.3776743922399437, "mean_relative_gain": 0.038511136869583906, "not_converged": {"0": [5]}, "per_agent": [{"agent": 0, "cpu": 0.6, "cost_before": 1.8661542219540304, "cost_after": 1.818709853888169, "gain": 0.04744436806586189, "gain_ci95": 0.0264986445359308, "gain_per_seed": [0.04744436806586189], "converged_all_seeds": true}, {"agent": 1, "cpu": 0.7, "cost_before": 1.8215452428758583, "cost_after": 1.6750760718363529, "gain": 0.1464691710395053, "gain_ci95": 0.028880908390123295, "gain_per_seed": [0.1464691710395053], "converged_all_seeds": true}, {"agent": 2, "cpu": 0.8, "cost_before": 1.674936951476783, "cost_after": 1.6095038310860317, "gain": 0.0654331203907514, "gain_ci95": 0.018921651649871526, "gain_per_seed": [0.0654331203907514], "converged_all_seeds": true}, {"agent": 3, "cpu": 0.9, "cost_before": 1.6406786680273064, "cost_after": 1.5872408760626808, "gain": 0.053437791964625524, "gain_ci95": 0.020387938349770394, "gain_per_seed": [0.053437791964625524], "converged_all_seeds": true}, {"agent": 4, "cpu": 1.0, "cost_before": 1.616809054023008, "cost_after": 1.5301523590567225, "gain": 0.08665669496628574, "gain_ci95": 0.01742028013965098, "gain_per_seed": [0.08665669496628574], "converged_all_seeds": true}, {"agent": 5, "cpu": 1.2, "cost_before": 1.5706840253023013, "cost_after": 1.5924507794893874, "gain": -0.021766754187086138, "gain_ci95": 0.015286262522585567, "gain_per_seed": [-0.021766754187086138], "converged_all_seeds": false}], "eval_episodes": 300, "updates": 300, "warm_start": false}}, "findings": [{"n": 1, "cat": "core", "sev": "major", "status": "fixed", "title": "The \"delayed\" signal gave the exact current load", "problem": "The observed signal was the queue before service; the current queue follows from it exactly (max(0, signal \u2212 3)), and greedy did that computation. The claimed partial observability did not exist, and the extra input of the MAPPO critic was redundant.", "before": "greedy 1.573 \u00b7 IPPO \u2248 MAPPO (1.490 / 1.489)", "after": "New parameter <code>signal_delay<\/code> (default 2): the signal really is 2 steps old. greedy 1.702 \u00b7 IPPO 1.492 \u00b7 MAPPO 1.526", "files": "marl_offload/env.py \u00b7 marl_offload/baselines.py \u00b7 tests/test_env.py::test_load_signal_is_delayed"}, {"n": 2, "cat": "core", "sev": "major", "status": "fixed", "title": "The edge price was counted as a social cost", "problem": "The README concluded that the best price for the devices is 0, which is true by construction: the price is a transfer to the operator, not a loss for the system.", "before": "\"The best price for the devices is 0.\"", "after": "New metric <code>social_cost_per_task<\/code> (edge price excluded). Social optimum at price 0.6: 1.536 \u2192 1.443. The price acts as a congestion toll.", "files": "marl_offload/baselines.py \u00b7 scripts/stackelberg.py \u00b7 tests/test_env.py::test_social_cost_excludes_edge_price"}, {"n": 3, "cat": "core", "sev": "major", "status": "fixed", "title": "IQL bootstrapped on Q-values that were never trained", "problem": "Transitions without a task were skipped, but about 20 % of the next states o\u2032 have no task: the target used an arbitrary extrapolation of the network.", "before": "IQL 1.451 (3 seeds, old environment)", "after": "All transitions are stored. IQL 1.529 \u00b1 0.052 (5 seeds, delayed signal). Not directly comparable: the environment changed (finding 1).", "files": "marl_offload/iql.py \u00b7 tests/test_agents.py::test_iql_runs_and_reloads"}, {"n": 4, "cat": "core", "sev": "major", "status": "fixed", "title": "No measure of the distance to equilibrium", "problem": "The game is general-sum, but nothing checked that no device would gain by deviating.", "before": "No measure.", "after": "Exploitability analysis with a PPO best response, device by device. NashConv: greedy 0.399 \u00b7 greedy+toll 0.507 \u00b7 IQL 0.037 \u00b7 IPPO 0.041 \u00b7 MAPPO 0.017 (learners: mean over 1 seed). The learned policies are closer to an equilibrium than both rules.", "files": "marl_offload/exploitability.py \u00b7 scripts/exploitability.py \u00b7 Equilibrium tab"}, {"n": 5, "cat": "core", "sev": "major", "status": "fixed", "title": "The first exploitability measure mostly tested the optimizer", "problem": "For MAPPO and IPPO, the best response (200 updates from scratch) did worse than the base policy for almost every device, and negative gains were clipped to 0: NashConv = 0 measured a weak optimizer, not an equilibrium. The greedy+toll run had also stopped after 5 of 6 devices.", "before": "Best response from scratch, 100 unpaired episodes, negative gains erased, 1 seed, greedy+toll incomplete.", "after": "Warm start from the current policy, best checkpoint selected on validation episodes, before and after on the same 300 episodes with 95 % CI, raw gains kept, non-convergence flagged, 2 seeds for the learners, greedy+toll complete. Test: a best response initialised this way does not do worse than the base policy.", "files": "marl_offload/exploitability.py \u00b7 tests/test_exploitability.py"}, {"n": 6, "cat": "core", "sev": "medium", "status": "fixed", "title": "Too few seeds to rank the methods", "problem": "The IQL/PPO gap (0.04) rested on 3 seeds, with a standard deviation of about 0.02.", "before": "3 seeds, no interval", "after": "5 seeds, Student 95 % CI: IQL \u00b1 0.052 \u00b7 IPPO \u00b1 0.018 \u00b7 MAPPO \u00b1 0.033. The intervals overlap: no clear ranking of the three learners.", "files": "scripts/train.py"}, {"n": 7, "cat": "model", "sev": "medium", "status": "fixed", "title": "The greedy baseline was too weak", "problem": "Without a tuned baseline, a gain of a few percent is hard to interpret.", "before": "greedy only", "after": "Added <code>greedy+toll<\/code>: virtual toll 0.8 tuned on separate seeds \u2192 1.484 (best learner: 1.492).", "files": "marl_offload/baselines.py \u00b7 scripts/train.py"}, {"n": 8, "cat": "model", "sev": "medium", "status": "doc", "title": "The cloud option is almost always dominated", "problem": "At zero price the cloud is almost never chosen: in practice the problem has two actions.", "before": "cloud share \u2248 0", "after": "Unchanged (MAPPO cloud share 0.000). Next step: lower <code>cloud_delay<\/code> or <code>cloud_fee<\/code>.", "files": "marl_offload/env.py \u00b7 EnvConfig"}, {"n": 9, "cat": "model", "sev": "minor", "status": "doc", "title": "The leader is static and the bandit only confirms the sweep", "problem": "UCB picks among the 16 prices already evaluated exhaustively; it confirms the sweep and learns nothing more.", "before": "UCB \u2192 1.2", "after": "Unchanged, documented. UCB \u2192 1.2, sweep \u2192 1.2. Next step: a dynamic price learned jointly.", "files": "scripts/stackelberg.py"}, {"n": 10, "cat": "code", "sev": "medium", "status": "fixed", "title": "PPO was not reproducible", "problem": "Minibatch shuffling used NumPy's global generator, without a seed.", "before": "<code>np.random.shuffle(idx)<\/code>", "after": "Dedicated seeded generator; bit-exact reproducibility test.", "files": "marl_offload/ppo.py \u00b7 tests/test_agents.py::test_ppo_is_reproducible"}, {"n": 11, "cat": "code", "sev": "minor", "status": "fixed", "title": "Evaluation episodes seen during training", "problem": "PPO seed 0, update 10, trained on seeds 10000 to 10007, which are also evaluation seeds.", "before": "overlapping training and evaluation seeds", "after": "<code>TRAIN_SEED = 10\u2078<\/code>, <code>EVAL_SEED = 10\u2074<\/code>, <code>TUNE_SEED = 5\u00b710\u2074<\/code>, <code>VAL_SEED = 3\u00b710\u2074<\/code>: disjoint ranges.", "files": "marl_offload/ppo.py \u00b7 marl_offload/iql.py \u00b7 marl_offload/baselines.py"}, {"n": 12, "cat": "code", "sev": "minor", "status": "fixed", "title": "The price stuck from one reset to the next", "problem": "reset(price=None) kept the previous price instead of going back to cfg.edge_price.", "before": "price of the previous episode", "after": "back to <code>cfg.edge_price<\/code>; dedicated test.", "files": "marl_offload/env.py \u00b7 tests/test_env.py::test_price_resets_to_config_default"}, {"n": 13, "cat": "code", "sev": "minor", "status": "fixed", "title": "Figures not reproducible and hard-coded values", "problem": "The per-device figure used MAPPO seed 0 only; \"\u00d7 6\" instead of the number of agents; default arguments differed from the README.", "before": "1 seed, hard-coded constants", "after": "Mean over all seeds, IQL and greedy+toll added; defaults aligned (400 PPO updates, 1000 IQL episodes, 5 seeds).", "files": "scripts/plots.py \u00b7 scripts/train.py"}, {"n": 14, "cat": "code", "sev": "minor", "status": "fixed", "title": "Fragile tests and no test of the algorithms", "problem": "Two tests assumed that all channels were in the same state; IQL, PPO and exploitability were not tested.", "before": "5 tests", "after": "14 tests: exact queue latencies, delayed signal, price, social cost, IQL, PPO, best response.", "files": "tests/"}, {"n": 15, "cat": "code", "sev": "minor", "status": "fixed", "title": "No git repository and no packaging", "problem": "The folder was not versioned; scripts edited sys.path; Python \u2265 3.10 was not declared anywhere.", "before": "sys.path edited in every script", "after": "<code>pyproject.toml<\/code> (Python \u2265 3.10), <code>pip install -e .<\/code>, no more sys.path; git repository.", "files": "pyproject.toml \u00b7 .gitignore"}]}</script>
+<script>
+const D = JSON.parse(document.getElementById("data").textContent);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const fmt = (v, d = 3) => (v == null || isNaN(v)) ? "–" : Number(v).toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
+const pct = (v, d = 0) => fmt(100 * v, d) + "%";
+const NS = "http://www.w3.org/2000/svg";
+const el = (tag, attrs = {}, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+const COL = { IQL: "--s1", IPPO: "--s2", MAPPO: "--s3", "greedy+toll": "--s4", greedy: "--base", random: "--base-soft" };
+const LEARNED = ["IQL", "IPPO", "MAPPO"];
+
+/* ---------- tooltip ---------- */
+const tip = document.getElementById("tip");
+function showTip(chartEl, x, y, html) {
+  tip.innerHTML = html; tip.hidden = false;
+  const r = chartEl.getBoundingClientRect(), tw = tip.offsetWidth, th = tip.offsetHeight;
+  let left = r.left + window.scrollX + x + 14, top = r.top + window.scrollY + y - th - 10;
+  if (left + tw > window.scrollX + document.documentElement.clientWidth - 8) left = r.left + window.scrollX + x - tw - 14;
+  if (top < window.scrollY + 8) top = r.top + window.scrollY + y + 14;
+  tip.style.left = left + "px"; tip.style.top = top + "px";
+}
+const hideTip = () => { tip.hidden = true; };
+const row = (color, name, val) => `<div class="row"><span><i style="background:${color}"></i>${name}</span><b>${val}</b></div>`;
+
+/* ---------- scales ---------- */
+function niceTicks(lo, hi, n = 5) {
+  const span = hi - lo, step0 = span / n, mag = Math.pow(10, Math.floor(Math.log10(step0)));
+  const step = [1, 2, 2.5, 5, 10].map(m => m * mag).find(s => span / s <= n) || 10 * mag;
+  const out = []; for (let v = Math.ceil(lo / step - 1e-9) * step; v <= hi + 1e-9; v += step) out.push(+v.toFixed(10));
+  return out;
+}
+function frame(container, H, m) {
+  container.innerHTML = "";
+  const W = Math.max(container.clientWidth, 300);
+  const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img" }, container);
+  return { svg, W, H, iw: W - m.l - m.r, ih: H - m.t - m.b, m };
+}
+
+/* ---------- line chart ---------- */
+function lineChart(container, o) {
+  const f = frame(container, o.height || 280, { l: 52, r: 16, t: 12, b: 38 });
+  const { svg, iw, ih, m } = f;
+  const all = o.series.flatMap(s => s.points.flatMap(p => [p[1], ...(s.band ? [] : [])]))
+    .concat(o.series.flatMap(s => s.band ? s.band.flatMap(b => [b[1], b[2]]) : []))
+    .concat((o.refs || []).map(r => r.y));
+  const xs = o.series.flatMap(s => s.points.map(p => p[0]));
+  const x0 = o.xDomain ? o.xDomain[0] : Math.min(...xs), x1 = o.xDomain ? o.xDomain[1] : Math.max(...xs);
+  let y0 = o.yDomain ? o.yDomain[0] : Math.min(...all), y1 = o.yDomain ? o.yDomain[1] : Math.max(...all);
+  if (!o.yDomain) { const pad = (y1 - y0) * 0.08 || 0.1; y0 -= pad; y1 += pad; }
+  const X = v => m.l + (v - x0) / (x1 - x0) * iw, Y = v => m.t + ih - (Math.min(Math.max(v, y0), y1) - y0) / (y1 - y0) * ih;
+  const g = el("g", {}, svg);
+  for (const t of niceTicks(y0, y1, 5)) {
+    el("line", { x1: m.l, x2: m.l + iw, y1: Y(t), y2: Y(t), stroke: css("--grid") }, g);
+    el("text", { x: m.l - 8, y: Y(t) + 4, "text-anchor": "end" }, g).textContent = o.yFmt ? o.yFmt(t) : fmt(t, 2);
+  }
+  for (const t of niceTicks(x0, x1, Math.max(3, Math.floor(iw / 90)))) {
+    el("text", { x: X(t), y: m.t + ih + 18, "text-anchor": "middle" }, g).textContent = o.xFmt ? o.xFmt(t) : t;
+  }
+  el("line", { x1: m.l, x2: m.l + iw, y1: m.t + ih, y2: m.t + ih, stroke: css("--rule") }, g);
+  if (o.xLabel) el("text", { x: m.l + iw / 2, y: f.H - 4, "text-anchor": "middle", class: "lbl" }, g).textContent = o.xLabel;
+  for (const r of o.refs || []) {
+    el("line", { x1: m.l, x2: m.l + iw, y1: Y(r.y), y2: Y(r.y), stroke: css(r.color), "stroke-width": 1.5, "stroke-dasharray": "5 4" }, g);
+    el("text", { x: m.l + iw - 4, y: Y(r.y) - 5, "text-anchor": "end", class: "lbl" }, g).textContent = r.label;
+  }
+  for (const v of o.vlines || []) {
+    el("line", { x1: X(v.x), x2: X(v.x), y1: m.t, y2: m.t + ih, stroke: css(v.color), "stroke-width": 1.5, "stroke-dasharray": "3 3" }, g);
+    el("text", { x: X(v.x) + 5, y: m.t + 11, class: "lbl" }, g).textContent = v.label;
+  }
+  for (const s of o.series) {
+    if (s.band) {
+      const d = s.band.map((b, i) => `${i ? "L" : "M"}${X(b[0])},${Y(b[2])}`).join("") + s.band.slice().reverse().map(b => `L${X(b[0])},${Y(b[1])}`).join("") + "Z";
+      el("path", { d, fill: css(s.color), opacity: 0.14 }, g);
+    }
+    const d = s.points.map((p, i) => `${i ? "L" : "M"}${X(p[0])},${Y(p[1])}`).join("");
+    el("path", { d, class: "line", fill: "none", stroke: css(s.color), "stroke-width": 2, "stroke-linejoin": "round", ...(s.dash ? { "stroke-dasharray": "5 4" } : {}) }, g);
+    if (s.dots) for (const p of s.points) el("circle", { cx: X(p[0]), cy: Y(p[1]), r: 3.5, fill: css(s.color), stroke: css("--surface"), "stroke-width": 2 }, g);
+  }
+  // hover crosshair
+  const cross = el("line", { y1: m.t, y2: m.t + ih, stroke: css("--ink-3"), "stroke-width": 1, visibility: "hidden" }, svg);
+  const dots = o.series.map(s => el("circle", { r: 4.5, fill: css(s.color), stroke: css("--surface"), "stroke-width": 2, visibility: "hidden" }, svg));
+  const hit = el("rect", { x: m.l, y: m.t, width: iw, height: ih, fill: "transparent" }, svg);
+  const move = ev => {
+    const pt = svg.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY;
+    const p = pt.matrixTransform(svg.getScreenCTM().inverse());
+    const xv = x0 + (p.x - m.l) / iw * (x1 - x0);
+    const ref = o.series[0].points; let best = 0;
+    ref.forEach((q, i) => { if (Math.abs(q[0] - xv) < Math.abs(ref[best][0] - xv)) best = i; });
+    const xx = ref[best][0];
+    cross.setAttribute("x1", X(xx)); cross.setAttribute("x2", X(xx)); cross.setAttribute("visibility", "visible");
+    let html = `<b>${o.xTip ? o.xTip(xx) : xx}</b>`;
+    o.series.forEach((s, i) => {
+      const q = s.points.find(q => q[0] === xx) || s.points[best];
+      if (!q) return;
+      dots[i].setAttribute("cx", X(q[0])); dots[i].setAttribute("cy", Y(q[1])); dots[i].setAttribute("visibility", "visible");
+      html += row(css(s.color), s.name, o.yTip ? o.yTip(q[1]) : fmt(q[1]));
+    });
+    const r = container.getBoundingClientRect(), sc = r.width / f.W;
+    showTip(container, X(xx) * sc, m.t * sc + 20, html);
+  };
+  hit.addEventListener("pointermove", move);
+  hit.addEventListener("pointerleave", () => { cross.setAttribute("visibility", "hidden"); dots.forEach(d => d.setAttribute("visibility", "hidden")); hideTip(); });
+}
+
+/* ---------- horizontal bar chart (one measure) ---------- */
+function hbarChart(container, o) {
+  const rowH = 30, H = o.items.length * rowH + 34;
+  const f = frame(container, H, { l: o.labelW || 110, r: 64, t: 6, b: 28 });
+  const { svg, iw, ih, m } = f;
+  const vmax = o.max ?? Math.max(...o.items.map(d => d.value + (d.err || 0))) * 1.05;
+  const X = v => m.l + Math.min(v, vmax) / vmax * iw;
+  for (const t of niceTicks(0, vmax, Math.max(3, Math.floor(iw / 80)))) {
+    el("line", { x1: X(t), x2: X(t), y1: m.t, y2: m.t + ih, stroke: css("--grid") }, svg);
+    el("text", { x: X(t), y: H - 10, "text-anchor": "middle" }, svg).textContent = fmt(t, 1);
+  }
+  o.items.forEach((d, i) => {
+    const y = m.t + i * rowH + 5, h = rowH - 10;
+    const lbl = el("text", { x: m.l - 10, y: y + h / 2 + 4, "text-anchor": "end", class: "lbl" }, svg);
+    lbl.textContent = d.label; if (d.strong) lbl.setAttribute("font-weight", "600");
+    const w = Math.max(X(d.value) - m.l, 2);
+    el("path", { d: `M${m.l},${y}h${w - 4}a4,4 0 0 1 4,4v${h - 8}a4,4 0 0 1 -4,4h${-(w - 4)}Z`, fill: css(d.color) }, svg);
+    if (d.err) {
+      const a = X(d.value - d.err), b = X(d.value + d.err), cy = y + h / 2;
+      el("line", { x1: a, x2: b, y1: cy, y2: cy, stroke: css("--ink"), "stroke-width": 1.5 }, svg);
+      el("line", { x1: a, x2: a, y1: cy - 5, y2: cy + 5, stroke: css("--ink"), "stroke-width": 1.5 }, svg);
+      el("line", { x1: b, x2: b, y1: cy - 5, y2: cy + 5, stroke: css("--ink"), "stroke-width": 1.5 }, svg);
+    }
+    const tx = d.value > vmax ? m.l + iw + 6 : X(d.value + (d.err || 0)) + 6;
+    el("text", { x: tx, y: y + h / 2 + 4, class: "lbl" }, svg).textContent = d.value > vmax ? `${fmt(d.value, 2)} →` : fmt(d.value, 3);
+    const hit = el("rect", { x: 0, y: y - 4, width: f.W, height: rowH, fill: "transparent" }, svg);
+    hit.addEventListener("pointermove", ev => { const r = container.getBoundingClientRect(); showTip(container, ev.clientX - r.left, ev.clientY - r.top, d.tip); });
+    hit.addEventListener("pointerleave", hideTip);
+  });
+}
+
+/* ---------- grouped vertical bars ---------- */
+function groupedBars(container, o) {
+  const f = frame(container, o.height || 260, { l: 46, r: 10, t: 10, b: 44 });
+  const { svg, iw, ih, m } = f;
+  const vmax = o.max ?? Math.max(...o.series.flatMap(s => s.values)) * 1.1;
+  const Y = v => m.t + ih - v / vmax * ih;
+  for (const t of niceTicks(0, vmax, 4)) {
+    el("line", { x1: m.l, x2: m.l + iw, y1: Y(t), y2: Y(t), stroke: css("--grid") }, svg);
+    el("text", { x: m.l - 8, y: Y(t) + 4, "text-anchor": "end" }, svg).textContent = o.yFmt(t);
+  }
+  const gw = iw / o.groups.length, inner = gw * 0.78, bw = inner / o.series.length;
+  o.groups.forEach((gname, gi) => {
+    const gx = m.l + gi * gw + (gw - inner) / 2;
+    o.series.forEach((s, si) => {
+      const v = s.values[gi], x = gx + si * bw + 1, w = Math.max(bw - 2, 2), y = Y(Math.max(v, 0)), h = m.t + ih - y;
+      if (h > 4) el("path", { d: `M${x},${m.t + ih}v${-(h - 4)}a4,4 0 0 1 4,-4h${w - 8}a4,4 0 0 1 4,4v${h - 4}Z`, fill: css(s.color) }, svg);
+      else el("rect", { x, y: m.t + ih - Math.max(h, 1), width: w, height: Math.max(h, 1), fill: css(s.color) }, svg);
+    });
+    const [a, b] = gname.split("\n");
+    el("text", { x: gx + inner / 2, y: m.t + ih + 16, "text-anchor": "middle", class: "lbl" }, svg).textContent = a;
+    if (b) el("text", { x: gx + inner / 2, y: m.t + ih + 30, "text-anchor": "middle" }, svg).textContent = b;
+    const hit = el("rect", { x: m.l + gi * gw, y: m.t, width: gw, height: ih, fill: "transparent" }, svg);
+    hit.addEventListener("pointermove", ev => {
+      const r = container.getBoundingClientRect();
+      showTip(container, ev.clientX - r.left, ev.clientY - r.top, `<b>${gname.replace("\n", " · ")}</b>` + o.series.map(s => row(css(s.color), s.name, o.yFmt(s.values[gi]))).join(""));
+    });
+    hit.addEventListener("pointerleave", hideTip);
+  });
+  el("line", { x1: m.l, x2: m.l + iw, y1: m.t + ih, y2: m.t + ih, stroke: css("--rule") }, svg);
+}
+
+function legend(target, items) {
+  const nodes = typeof target === "string" ? document.querySelectorAll(target) : [target];
+  nodes.forEach(n => n.innerHTML = items.map(it => `<span><i class="${it.kind || ""}" style="--c:var(${it.color});background:var(${it.color})"></i>${it.name}</span>`).join(""));
+}
+
+/* ================================================================ content */
+const F = D.final;
+document.getElementById("delay").textContent = D.signal_delay;
+document.getElementById("gen").textContent = D.generated;
+
+function kpis(target, items) {
+  document.getElementById(target).innerHTML = items.map(k => `<div class="kpi"><span class="v">${k.v}</span><span class="l">${k.l}</span></div>`).join("");
+}
+const bestLearned = LEARNED.reduce((a, b) => F[a].cost_per_task < F[b].cost_per_task ? a : b);
+const gain = 1 - F[bestLearned].cost_per_task / F.greedy.cost_per_task;
+kpis("kpis", [
+  { v: fmt(F[bestLearned].cost_per_task, 3), l: `best learner (${bestLearned}), cost per task` },
+  { v: "−" + pct(gain, 1), l: "against the myopic greedy rule" },
+  { v: fmt(F["greedy+toll"].cost_per_task, 3), l: `greedy with a virtual toll of ${fmt(F["greedy+toll"].toll, 1)}` },
+  { v: String(F.IQL.seeds.length), l: "training seeds per method" },
+]);
+
+/* diagram */
+function drawDiagram() {
+  const box = document.getElementById("diagram"); box.innerHTML = "";
+  const W = 760, H = 250, svg = el("svg", { viewBox: `0 0 ${W} ${H}` }, box);
+  const speeds = D.speeds;
+  speeds.forEach((s, i) => {
+    const y = 18 + i * 37;
+    el("rect", { x: 10, y, width: 150, height: 28, rx: 5, fill: css("--surface"), stroke: css("--rule") }, svg);
+    el("rect", { x: 10, y, width: 150 * s / 1.2, height: 28, rx: 5, fill: css("--s1"), opacity: 0.16 }, svg);
+    el("text", { x: 20, y: y + 18 }, svg).textContent = `device ${i} · CPU ${s}`;
+    el("path", { d: `M160,${y + 14} C 260,${y + 14} 260,95 360,95`, fill: "none", stroke: css("--s2"), "stroke-width": 1.2, opacity: 0.7 }, svg);
+    el("path", { d: `M160,${y + 14} C 280,${y + 14} 300,205 520,205`, fill: "none", stroke: css("--s3"), "stroke-width": 1, opacity: 0.45, "stroke-dasharray": "4 4" }, svg);
+  });
+  el("rect", { x: 360, y: 60, width: 250, height: 70, rx: 8, fill: css("--surface"), stroke: css("--s2"), "stroke-width": 1.5 }, svg);
+  for (let k = 0; k < 7; k++) el("rect", { x: 372 + k * 22, y: 80, width: 18, height: 30, rx: 3, fill: css("--s2"), opacity: 0.25 + 0.1 * (k % 3) }, svg);
+  el("text", { x: 540, y: 92, "font-weight": 600 }, svg).textContent = "Edge";
+  el("text", { x: 540, y: 110 }, svg).textContent = "3 units / step";
+  el("text", { x: 372, y: 148 }, svg).textContent = "shared FIFO queue, persists across steps";
+  el("rect", { x: 520, y: 182, width: 160, height: 46, rx: 8, fill: css("--surface"), stroke: css("--s3"), "stroke-width": 1.5 }, svg);
+  el("text", { x: 534, y: 202, "font-weight": 600 }, svg).textContent = "Cloud";
+  el("text", { x: 534, y: 219 }, svg).textContent = "+1.5 steps · fee 0.3";
+  el("path", { d: "M610,95 C 690,95 700,40 640,30", fill: "none", stroke: css("--ink-3"), "stroke-dasharray": "3 3" }, svg);
+  el("text", { x: 618, y: 24 }, svg).textContent = `load signal, delay ${D.signal_delay}`;
+}
+
+/* results */
+document.getElementById("res-lede").textContent =
+  `The three learners beat the myopic greedy rule (${fmt(F.greedy.cost_per_task)}). ` +
+  `But a greedy rule that adds a virtual toll of ${fmt(F["greedy+toll"].toll, 1)} to the edge, tuned on separate seeds, reaches ${fmt(F["greedy+toll"].cost_per_task)}. ` +
+  (LEARNED.every(n => F[n].cost_per_task > F["greedy+toll"].cost_per_task)
+    ? `No learner does better: most of the gain comes from internalising congestion, which a simple rule already captures.`
+    : `${bestLearned} does better than this baseline.`);
+
+const order = ["all-edge", "all-local", "all-cloud", "random", "greedy", "greedy+toll", ...LEARNED];
+const barCol = n => COL[n] || "--base-soft";
+function drawFinal() {
+  hbarChart(document.getElementById("c-final"), {
+    max: 4.6, labelW: 96,
+    items: order.map(n => ({
+      label: n, value: F[n].cost_per_task, err: F[n].cost_per_task_ci95, color: barCol(n), strong: LEARNED.includes(n),
+      tip: `<b>${n}</b>` + row(css(barCol(n)), "cost / task", fmt(F[n].cost_per_task)) +
+        (F[n].cost_per_task_ci95 != null ? row(css("--ink-3"), "IC 95 %", "± " + fmt(F[n].cost_per_task_ci95)) : "") +
+        row(css("--ink-3"), "latency", fmt(F[n].latency_per_task)) + row(css("--ink-3"), "energy", fmt(F[n].energy_per_task)) +
+        row(css("--ink-3"), "mean edge queue", fmt(F[n].mean_edge_backlog, 2)) +
+        (F[n].cost_per_task_per_seed ? row(css("--ink-3"), "per seed", F[n].cost_per_task_per_seed.map(v => fmt(v, 2)).join(" · ")) : ""),
+    })),
+  });
+}
+function drawCurves() {
+  legend(document.getElementById("l-curves"), [...LEARNED.map(n => ({ name: n, color: COL[n] })),
+    { name: "greedy", color: "--base", kind: "dash" }, { name: "greedy+toll", color: "--s4", kind: "dash" }]);
+  lineChart(document.getElementById("c-curves"), {
+    height: 300, yDomain: [1.3, 2.3],
+    series: LEARNED.map(n => ({ name: n, color: COL[n], points: D.curves[n].map(p => [p[0], p[1]]), band: D.curves[n].map(p => [p[0], p[1] - p[2], p[1] + p[2]]) })),
+    refs: [{ y: F.greedy.cost_per_task, color: "--base", label: "greedy" }, { y: F["greedy+toll"].cost_per_task, color: "--s4", label: "greedy+toll" }],
+    xLabel: "experience (thousands of agent-steps)", xFmt: v => fmt(v / 1000, 0), xTip: v => `${fmt(v / 1000, 0)}k agent-steps`,
+  });
+}
+function drawAgents() {
+  const names = Object.keys(D.per_agent);
+  legend(document.getElementById("l-agents"), names.map(n => ({ name: n, color: COL[n], kind: "box" })));
+  groupedBars(document.getElementById("c-agents"), {
+    groups: D.speeds.map((s, i) => `dev. ${i}\nCPU ${s}`),
+    series: names.map(n => ({ name: n, color: COL[n], values: D.per_agent[n] })), max: 1, yFmt: v => pct(v),
+  });
+  const m = D.per_agent.MAPPO, g = D.per_agent.greedy, t = D.per_agent["greedy+toll"];
+  document.getElementById("agents-note").textContent =
+    `All policies give the shared server mostly to the slow devices. With MAPPO, the slowest device sends ${pct(m[0])} of its tasks there and the fastest ${pct(m[m.length - 1])}; ` +
+    `with greedy, ${pct(g[0])} against ${pct(g[g.length - 1])}. The toll reduces edge use for everybody (${pct(t[0])} against ${pct(t[t.length - 1])}). Learned policies: mean over all seeds.`;
+}
+function drawTable() {
+  const cols = [["cost_per_task", "cost / task", 3], ["cost_per_task_ci95", "95% CI", 3], ["latency_per_task", "latency", 3], ["energy_per_task", "energy", 3], ["share_local", "local", 2], ["share_edge", "edge", 2], ["share_cloud", "cloud", 2], ["mean_edge_backlog", "edge queue", 2]];
+  const best = Math.min(...order.map(n => F[n].cost_per_task));
+  document.getElementById("t-final").innerHTML = `<thead><tr><th>policy</th>${cols.map(c => `<th>${c[1]}</th>`).join("")}</tr></thead><tbody>` +
+    order.map(n => `<tr class="${LEARNED.includes(n) ? "learned" : ""} ${F[n].cost_per_task === best ? "best" : ""}"><td>${n}</td>${cols.map(c => `<td>${F[n][c[0]] == null ? "–" : (c[0] === "cost_per_task_ci95" ? "± " : "") + fmt(F[n][c[0]], c[2])}</td>`).join("")}</tr>`).join("") + "</tbody>";
+}
+
+/* leader */
+const S = D.stackelberg, SW = S.sweep, SU = S.summary;
+kpis("kpis-leader", [
+  { v: fmt(SU.bandit_price, 1), l: `price chosen by the bandit (${pct(SU.bandit_share_of_plays)} of episodes)` },
+  { v: fmt(SU.sweep_optimal_price, 1), l: "best price in the exhaustive sweep" },
+  { v: fmt(SU.social_optimal_price, 1), l: "price that minimises the social cost (MAPPO followers)" },
+  { v: fmt(SU.social_optimal_price_greedy, 1), l: "same with greedy followers" },
+]);
+let followFilter = "both";
+function sweepSeries(key) {
+  const keys = followFilter === "both" ? ["learned", "greedy"] : [followFilter];
+  return keys.map(k => ({ name: k === "learned" ? "MAPPO followers" : "greedy followers", color: k === "learned" ? "--s3" : "--base", dots: true,
+    points: SW.price.map((p, i) => [p, SW[k][i][key]]) }));
+}
+function drawLeader() {
+  const keys = followFilter === "both" ? ["learned", "greedy"] : [followFilter];
+  legend(".l-sweep", keys.map(k => ({ name: k === "learned" ? "MAPPO followers" : "greedy followers", color: k === "learned" ? "--s3" : "--base" })));
+  const common = { height: 250, xLabel: "posted edge price", xFmt: v => fmt(v, 1), xTip: v => `price ${fmt(v, 1)}` };
+  lineChart(document.getElementById("c-payoff"), { ...common, series: sweepSeries("leader_payoff"), vlines: [{ x: SU.bandit_price, color: "--s2", label: "UCB choice" }] });
+  lineChart(document.getElementById("c-social"), { ...common, series: sweepSeries("social_cost_per_task"), vlines: [{ x: SU.social_optimal_price, color: "--s1", label: "social optimum" }] });
+  lineChart(document.getElementById("c-share"), { ...common, series: sweepSeries("share_edge"), yFmt: v => pct(v), yTip: v => pct(v, 1) });
+  const counts = SW.price.map(p => S.bandit_choices.filter(c => Math.abs(c - p) < 1e-6).length);
+  groupedBars(document.getElementById("c-bandit"), { height: 200, groups: SW.price.map(p => fmt(p, 1)), series: [{ name: "episodes", color: "--s2", values: counts }], yFmt: v => fmt(v, 0) });
+}
+const l0 = SW.learned[0].social_cost_per_task, li = SW.price.indexOf(SU.social_optimal_price), lopt = SW.learned[li].social_cost_per_task;
+document.getElementById("social-note").textContent =
+  `Counting the fee, the best price for the devices is trivially 0. But the fee is only a transfer to the operator. Without the transfer, a price of ${fmt(SU.social_optimal_price, 1)} lowers the social cost from ${fmt(l0)} to ${fmt(lopt)} (−${pct(1 - lopt / l0, 1)}): the price acts as a congestion toll. The operator chooses ${fmt(SU.sweep_optimal_price, 1)}.`;
+document.getElementById("bandit-sub").textContent = `${S.bandit_choices.length} episodes · 16 prices from 0 to 3`;
+
+/* equilibrium */
+const E = D.exploitability || {};
+const eqNames = ["greedy", "greedy+toll", "IQL", "IPPO", "MAPPO"].filter(n => E[n]);
+function drawEq() {
+  const any = eqNames[0];
+  const seedsTxt = eqNames.filter(n => !["greedy", "greedy+toll"].includes(n)).map(n => `${n}: ${E[n].seeds.length} seed${E[n].seeds.length > 1 ? "s" : ""}`).join(" · ");
+  document.getElementById("eq-method").textContent =
+    `${E[any].eval_episodes} paired evaluation episodes per device. ${seedsTxt}. The greedy rules do not depend on a seed.`;
+  kpis("kpis-eq", eqNames.map(n => ({ v: fmt(E[n].nash_conv, 3), l: `NashConv · ${n} (mean gain ${pct(E[n].mean_relative_gain, 1)})` })));
+  legend(document.getElementById("l-eq"), eqNames.map(n => ({ name: n, color: COL[n], kind: "box" })));
+  groupedBars(document.getElementById("c-eq"), {
+    groups: E[any].per_agent.map(r => `dev. ${r.agent}\nCPU ${r.cpu}`),
+    series: eqNames.map(n => ({ name: n, color: COL[n], values: E[n].per_agent.map(r => Math.max(0, r.gain) / r.cost_before) })),
+    yFmt: v => pct(v, 1),
+  });
+  const best = eqNames.reduce((a, b) => E[a].nash_conv < E[b].nash_conv ? a : b);
+  const worst = eqNames.reduce((a, b) => E[a].nash_conv > E[b].nash_conv ? a : b);
+  const nc = eqNames.filter(n => Object.values(E[n].not_converged).some(l => l.length));
+  document.getElementById("eq-note").textContent =
+    `${best} is the policy closest to an equilibrium (NashConv ${fmt(E[best].nash_conv)}), ${worst} the farthest (${fmt(E[worst].nash_conv)}). ` +
+    (nc.length ? `For ${nc.join(", ")}, the last PPO iterate of some devices does worse than the starting policy ("best response did not converge"); the selected checkpoint is still at least as good on validation.` : "For every device, the last PPO iterate does at least as well as the starting policy.");
+  document.getElementById("t-eq").innerHTML = `<thead><tr><th>policy</th><th>device</th><th>before</th><th>after</th><th>gain</th><th>95% CI</th><th>converged</th></tr></thead><tbody>` +
+    eqNames.flatMap(n => E[n].per_agent.map(r => `<tr><td>${n}</td><td>${r.agent} (CPU ${r.cpu})</td><td>${fmt(r.cost_before)}</td><td>${fmt(r.cost_after)}</td><td>${r.gain >= 0 ? "+" : ""}${fmt(r.gain)}</td><td>± ${fmt(r.gain_ci95)}</td><td>${r.converged_all_seeds ? "yes" : "no"}</td></tr>`)).join("") + "</tbody>";
+}
+
+/* review */
+const STATUS = { fixed: ["fixed", "fixed"], doc: ["doc", "documented"], todo: ["todo", "to do"] };
+let revFilter = "all";
+function drawFindings() {
+  const list = D.findings.filter(f => revFilter === "all" || f.cat === revFilter);
+  document.getElementById("findings").innerHTML = list.map(f => `
+    <article class="finding">
+      <span class="num">${String(f.n).padStart(2, "0")}</span>
+      <div class="body">
+        <div class="ttl"><h3>${f.title}</h3><span class="chip ${STATUS[f.status][0]}">${STATUS[f.status][1]}</span><span class="chip sev">${f.sev}</span></div>
+        <p class="small muted">${f.problem}</p>
+        <div class="ba"><div><span class="k">Before</span><div>${f.before}</div></div><div><span class="k">After</span><div>${f.after}</div></div></div>
+        <span class="files">${f.files}</span>
+      </div>
+    </article>`).join("");
+}
+document.getElementById("fix-count").textContent = `${D.findings.filter(f => f.status === "fixed").length}/${D.findings.length}`;
+
+/* ---------- views ---------- */
+const views = ["apercu", "resultats", "leader", "equilibre", "revue"].filter(v => v !== "equilibre" || eqNames.length);
+if (!eqNames.length) document.getElementById("tab-equilibre").hidden = true;  // analysis not finished: hide the tab
+const drawn = {};
+const drawers = { apercu: drawDiagram, resultats: () => { drawFinal(); drawCurves(); drawAgents(); drawTable(); }, leader: drawLeader, equilibre: drawEq, revue: drawFindings };
+function show(v) {
+  if (!views.includes(v)) v = "apercu";
+  document.querySelectorAll("[data-panel]").forEach(p => p.hidden = p.dataset.panel !== v);
+  document.querySelectorAll("nav.tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.view === v));
+  if (drawers[v]) drawers[v]();
+  drawn[v] = true; hideTip();
+}
+document.querySelectorAll("nav.tabs button").forEach(b => b.addEventListener("click", () => { location.hash = b.dataset.view; }));
+window.addEventListener("hashchange", () => show(location.hash.slice(1)));
+document.querySelectorAll("[data-f]").forEach(b => b.addEventListener("click", () => {
+  followFilter = b.dataset.f; document.querySelectorAll("[data-f]").forEach(x => x.setAttribute("aria-pressed", x === b)); drawLeader();
+}));
+document.querySelectorAll("[data-r]").forEach(b => b.addEventListener("click", () => {
+  revFilter = b.dataset.r; document.querySelectorAll("[data-r]").forEach(x => x.setAttribute("aria-pressed", x === b)); drawFindings();
+}));
+let rt; window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => show(location.hash.slice(1)), 150); });
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => show(location.hash.slice(1)));
+new MutationObserver(() => show(location.hash.slice(1))).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+show(location.hash.slice(1));
+</script>

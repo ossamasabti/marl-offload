@@ -10,7 +10,6 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker
 import numpy as np
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from marl_offload.baselines import GreedyPolicy
 from marl_offload.env import EnvConfig, OffloadEnv
@@ -124,20 +123,25 @@ def stackelberg():
 
 
 def exploitability():
+    """Raw gain of each device when it deviates alone, with 95 % CI over paired evaluation episodes."""
     d = json.load(open(os.path.join(RES, "exploitability.json")))
     names = [n for n in ("greedy", "greedy+toll", "IQL", "IPPO", "MAPPO") if n in d]
-    fig, ax = plt.subplots(figsize=(7.5, 3.4))
+    fig, ax = plt.subplots(figsize=(7.8, 3.6))
     w = 0.8 / len(names)
     for k, n in enumerate(names):
         rows = d[n]["per_agent"]
         xs = np.arange(len(rows))
-        ax.bar(xs + (k - (len(names) - 1) / 2) * w, [r["gain"] / r["cost_before"] for r in rows], w,
-               label=f"{n} (NashConv {d[n]['nash_conv']:.2f})", color=COL[n])
+        g = np.array([r["gain"] / r["cost_before"] for r in rows])
+        e = np.array([r["gain_ci95"] / r["cost_before"] for r in rows])
+        seeds = len(d[n]["seeds"])
+        ax.bar(xs + (k - (len(names) - 1) / 2) * w, g, w, yerr=e, capsize=2, error_kw={"lw": 0.8},
+               label=f"{n} (NashConv {d[n]['nash_conv']:.3f}, {seeds} seed{'s' if seeds > 1 else ''})", color=COL[n])
+    ax.axhline(0, color="#555", lw=0.8)
     ax.set_xticks(xs, [f"dev {r['agent']}\nCPU {r['cpu']}" for r in rows])
     ax.set_ylabel("cost reduction from deviating")
     ax.yaxis.set_major_formatter(matplotlib.ticker.PercentFormatter(1.0))
     ax.set_title("Exploitability: what a device gains by best-responding to the others")
-    ax.legend(frameon=False, fontsize=8)
+    ax.legend(frameon=False, fontsize=7.5)
     fig.tight_layout(); fig.savefig(os.path.join(FIG, "exploitability.png"), dpi=150)
 
 

@@ -1,10 +1,6 @@
 """Smoke tests: the learners run end to end, save and reload, and are reproducible."""
-import os
-import sys
 
 import torch
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from marl_offload.baselines import evaluate
 from marl_offload.env import EnvConfig, OffloadEnv

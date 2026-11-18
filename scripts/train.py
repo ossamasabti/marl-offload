@@ -6,14 +6,12 @@ Usage:
 import argparse
 import json
 import os
-import sys
 import multiprocessing as mp
 import time
 
 import numpy as np
 import torch
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from marl_offload.baselines import GreedyPolicy, all_baselines, evaluate, tune_greedy_toll
 from marl_offload.env import EnvConfig, OffloadEnv

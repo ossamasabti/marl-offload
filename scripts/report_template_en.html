@@ -1,0 +1,652 @@
+<title>MARL-Offload</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@600;700&display=swap">
+<style>
+/* Layout: a lab notebook — narrow reading column, tabbed sections, charts full column width */
+:root {
+  --bg: #f7f8fa;
+  --surface: #ffffff;
+  --ink: #12161c;
+  --ink-2: #4a525e;
+  --ink-3: #7a828e;
+  --rule: #dfe3ea;
+  --grid: #eceff3;
+  --accent: #2a78d6;
+  --accent-soft: #e6effb;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100;
+  --base: #8a919c; --base-soft: #c4c9d1;
+  --good: #1a7f4b; --good-bg: #e3f4ea;
+  --warn: #9a6200; --warn-bg: #fdf1d8;
+  --crit: #b3261e; --crit-bg: #fbe5e3;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-head: "IBM Plex Sans Condensed", "IBM Plex Sans", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111418; --surface: #181c22; --ink: #eef1f5; --ink-2: #b4bcc7; --ink-3: #8790a0;
+    --rule: #2b313a; --grid: #222830; --accent: #3987e5; --accent-soft: #1b2a3f;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
+    --base: #9aa2ad; --base-soft: #4b525c;
+    --good: #5cc98d; --good-bg: #16301f; --warn: #e3b04b; --warn-bg: #33280f; --crit: #f08a82; --crit-bg: #3a1a18;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111418; --surface: #181c22; --ink: #eef1f5; --ink-2: #b4bcc7; --ink-3: #8790a0;
+  --rule: #2b313a; --grid: #222830; --accent: #3987e5; --accent-soft: #1b2a3f;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
+  --base: #9aa2ad; --base-soft: #4b525c;
+  --good: #5cc98d; --good-bg: #16301f; --warn: #e3b04b; --warn-bg: #33280f; --crit: #f08a82; --crit-bg: #3a1a18;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.55; }
+.wrap { max-width: 920px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 28px 64px; }
+h1, h2, h3 { font-family: var(--f-head); text-wrap: balance; margin: 0; line-height: 1.15; }
+h1 { font-size: clamp(30px, 5vw, 42px); letter-spacing: -0.01em; }
+h2 { font-size: 22px; }
+h3 { font-size: 16px; }
+p { margin: 0; max-width: 68ch; }
+code, .mono { font-family: var(--f-mono); font-size: 0.88em; }
+code { background: var(--accent-soft); padding: 1px 5px; border-radius: 4px; }
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+.muted { color: var(--ink-2); }
+.small { font-size: 13px; }
+.stack { display: flex; flex-direction: column; gap: 14px; }
+.stack-lg { display: flex; flex-direction: column; gap: 36px; }
+
+header.top { display: flex; flex-direction: column; gap: 10px; padding-bottom: 22px; border-bottom: 1px solid var(--rule); }
+header.top p { color: var(--ink-2); font-size: 16px; }
+
+nav.tabs { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); display: flex; gap: 4px; overflow-x: auto; padding-block: 10px; border-bottom: 1px solid var(--rule); margin-bottom: 28px; scrollbar-width: thin; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+nav.tabs button { font: 500 14px var(--f-body); color: var(--ink-2); background: none; border: 1px solid transparent; border-radius: 6px; padding: 7px 12px; cursor: pointer; white-space: nowrap; }
+nav.tabs button:hover { color: var(--ink); background: var(--surface); }
+nav.tabs button[aria-selected="true"] { color: var(--accent); background: var(--accent-soft); }
+nav.tabs button:focus-visible, .seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+nav.tabs .count { font-family: var(--f-mono); font-size: 11px; margin-left: 6px; padding: 1px 6px; border-radius: 10px; background: var(--good-bg); color: var(--good); }
+
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+.kpi { background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; }
+.kpi .v { font-family: var(--f-head); font-size: 28px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.kpi .l { font-size: 13px; color: var(--ink-2); }
+
+.panel { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 18px 18px 14px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.panel-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px 16px; }
+.chart { position: relative; width: 100%; min-width: 0; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chart text { font-family: var(--f-body); font-size: 11px; fill: var(--ink-3); }
+.chart .lbl { fill: var(--ink-2); font-size: 11.5px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink-2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 14px; height: 3px; border-radius: 2px; display: inline-block; }
+.legend i.dash { background: repeating-linear-gradient(90deg, var(--c) 0 4px, transparent 4px 7px) !important; }
+.legend i.box { height: 10px; width: 10px; border-radius: 3px; }
+
+.tip { position: absolute; pointer-events: none; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 7px 9px; font-size: 12.5px; box-shadow: 0 4px 14px rgb(0 0 0 / 0.12); white-space: nowrap; z-index: 3; color: var(--ink); }
+.tip b { font-weight: 600; }
+.tip .row { display: flex; gap: 8px; align-items: center; justify-content: space-between; font-variant-numeric: tabular-nums; }
+.tip .row i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+
+.seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 7px; overflow: hidden; }
+.seg button { font: 500 12.5px var(--f-body); background: var(--surface); color: var(--ink-2); border: 0; padding: 5px 10px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--rule); }
+.seg button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); }
+
+.tbl-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; font-variant-numeric: tabular-nums; }
+th, td { text-align: right; padding: 7px 10px; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+th { font-weight: 600; color: var(--ink-2); font-size: 12px; }
+th:first-child, td:first-child { text-align: left; }
+tr.learned td:first-child { font-weight: 600; }
+tr.best td { background: var(--accent-soft); }
+
+.diagram { overflow-x: auto; }
+.diagram svg { min-width: 560px; width: 100%; height: auto; display: block; }
+.diagram text { font-family: var(--f-body); fill: var(--ink-2); font-size: 12px; }
+
+.actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.action { border-top: 3px solid var(--c); background: var(--surface); border-radius: 0 0 8px 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; border-left: 1px solid var(--rule); border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.action .formula { font-family: var(--f-mono); font-size: 12.5px; color: var(--ink-2); }
+
+.finding { background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 14px 16px; display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; }
+.finding .num { font-family: var(--f-mono); color: var(--ink-3); font-size: 13px; padding-top: 2px; }
+.finding .body { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.finding .ttl { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.finding .ttl h3 { font-family: var(--f-body); font-size: 15px; font-weight: 600; }
+.finding .files { font-family: var(--f-mono); font-size: 12px; color: var(--ink-3); overflow-wrap: anywhere; }
+.chip { font: 500 11.5px var(--f-mono); padding: 2px 8px; border-radius: 10px; display: inline-flex; align-items: center; gap: 5px; }
+.chip.fixed { background: var(--good-bg); color: var(--good); }
+.chip.doc { background: var(--warn-bg); color: var(--warn); }
+.chip.todo { background: var(--crit-bg); color: var(--crit); }
+.chip.sev { background: var(--grid); color: var(--ink-2); }
+.ba { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 13.5px; }
+.ba > div { background: var(--bg); border-radius: 6px; padding: 8px 10px; min-width: 0; }
+.ba .k { font-family: var(--f-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); }
+@media (max-width: 560px) { .ba { grid-template-columns: 1fr; } }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.callout { border-left: 3px solid var(--accent); padding: 4px 0 4px 14px; }
+footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--rule); font-size: 13px; color: var(--ink-3); display: flex; flex-direction: column; gap: 6px; }
+@media (prefers-reduced-motion: no-preference) { .chart path.line { transition: opacity .15s; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <span class="eyebrow">Research project · multi-agent RL · edge computing</span>
+    <h1>MARL-Offload</h1>
+    <p>Six heterogeneous devices share one edge server. Each one decides, task by task, whether to compute locally, on the edge or in the cloud. Can independent learners coordinate better than a myopic rule? And what price should the operator post?</p>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Sections">
+    <button role="tab" id="tab-apercu" data-view="apercu">Overview</button>
+    <button role="tab" id="tab-resultats" data-view="resultats">Results</button>
+    <button role="tab" id="tab-leader" data-view="leader">Leader–follower</button>
+    <button role="tab" id="tab-equilibre" data-view="equilibre">Equilibrium</button>
+    <button role="tab" id="tab-revue" data-view="revue">Review and fixes<span class="count" id="fix-count"></span></button>
+  </nav>
+
+  <!-- ============================================================ APERÇU -->
+  <section data-panel="apercu" class="stack-lg">
+    <div class="kpis" id="kpis"></div>
+
+    <div class="stack">
+      <h2>The game</h2>
+      <p class="muted">A general-sum Markov game: each device minimises its own cost <code>latency + energy + fee</code>. The devices are coupled through the shared edge queue, which persists from one time step to the next.</p>
+    </div>
+
+    <div class="panel">
+      <div class="diagram" id="diagram"></div>
+      <p class="small muted">Arrivals: 6 × 0.8 × 1.0 ≈ <b>4.8 units of work per step</b>. Edge capacity: <b>3</b>. The devices therefore have to share the server.</p>
+    </div>
+
+    <div class="actions">
+      <div class="action" style="--c: var(--s1)"><span class="eyebrow">Action 0</span><h3>Local</h3><span class="formula">(local queue + task) / f<sub>i</sub> + k·f<sub>i</sub>²·size</span><span class="small muted">Slow for weak CPUs, energy-hungry for fast CPUs.</span></div>
+      <div class="action" style="--c: var(--s2)"><span class="eyebrow">Action 1</span><h3>Edge</h3><span class="formula">upload + shared queue / 3 + price</span><span class="small muted">Fast when the queue is short. Everyone slows down if everyone goes there.</span></div>
+      <div class="action" style="--c: var(--s3)"><span class="eyebrow">Action 2</span><h3>Cloud</h3><span class="formula">upload + 1.5 + size / 10 + 0.3</span><span class="small muted">No congestion, but a long round trip and a fixed fee.</span></div>
+    </div>
+
+    <div class="stack">
+      <h2>What each device sees</h2>
+      <p class="muted">Its task, its local queue, its CPU speed, the state of its radio channel (a two-state Markov chain), the posted price, the time, and a public signal of the edge load that is <b><span id="delay"></span> steps old</b>. It never sees the other devices' decisions. The MAPPO critic also sees the full state and the true current load.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ RÉSULTATS -->
+  <section data-panel="resultats" class="stack-lg" hidden>
+    <div class="stack">
+      <h2>Cost per task</h2>
+      <p class="muted" id="res-lede"></p>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h3>Mean cost per task (lower is better)</h3><span class="small muted">100 evaluation episodes · error bars: 95 % CI over seeds</span></div>
+      <div class="chart" id="c-final"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h3>Learning curves</h3><span class="small muted">mean ± std over seeds</span></div>
+      <div class="legend" id="l-curves"></div>
+      <div class="chart" id="c-curves"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h3>Who uses the shared server?</h3><span class="small muted">share of tasks sent to the edge, per device</span></div>
+      <div class="legend" id="l-agents"></div>
+      <div class="chart" id="c-agents"></div>
+      <p class="small muted" id="agents-note"></p>
+    </div>
+
+    <div class="panel">
+      <h3>Full table</h3>
+      <div class="tbl-wrap"><table id="t-final"></table></div>
+    </div>
+  </section>
+
+  <!-- ============================================================ LEADER -->
+  <section data-panel="leader" class="stack-lg" hidden>
+    <div class="stack">
+      <h2>The operator sets a price</h2>
+      <p class="muted">The followers (one MAPPO policy) are trained with a random price drawn at each episode, so they learn a price-conditioned response. The operator then learns its price with a UCB1 bandit, observing only its own payoff <code>revenue − 0.5 × mean edge queue</code>.</p>
+    </div>
+    <div class="kpis" id="kpis-leader"></div>
+
+    <div class="filters">
+      <span class="small muted">Followers:</span>
+      <div class="seg" role="group" aria-label="Followers shown">
+        <button id="f-both" data-f="both" aria-pressed="true">Both</button>
+        <button id="f-learned" data-f="learned" aria-pressed="false">MAPPO</button>
+        <button id="f-greedy" data-f="greedy" aria-pressed="false">Greedy</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h3>Operator payoff</h3><span class="small muted">revenue − congestion, per step</span></div>
+      <div class="legend l-sweep"></div>
+      <div class="chart" id="c-payoff"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h3>Social cost per task</h3><span class="small muted">latency + energy + cloud fee · the edge price is a transfer and is excluded</span></div>
+      <div class="legend l-sweep"></div>
+      <div class="chart" id="c-social"></div>
+      <p class="small callout" id="social-note"></p>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h3>Share of tasks sent to the edge</h3></div>
+      <div class="legend l-sweep"></div>
+      <div class="chart" id="c-share"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h3>Prices played by the UCB bandit</h3><span class="small muted" id="bandit-sub"></span></div>
+      <div class="chart" id="c-bandit"></div>
+    </div>
+  </section>
+
+  <!-- ============================================================ ÉQUILIBRE -->
+  <section data-panel="equilibre" class="stack-lg" hidden>
+    <div class="stack">
+      <h2>Is it a Nash equilibrium?</h2>
+      <p class="muted">For each device, the other five are frozen on the joint policy and the device trains a best response with PPO. For learned policies, the best response starts from the device's current policy and fine-tunes it; for the rules, it starts from scratch and trains longer. The best checkpoint is selected on validation episodes, and the starting policy is one of the candidates. Before and after are evaluated on the same episodes. If no device gains by deviating, the policy is an equilibrium; the sum of the positive gains (NashConv) measures the distance to equilibrium. The best response is learned, so these gains are lower bounds.</p>
+      <p class="small muted" id="eq-method"></p>
+    </div>
+    <div class="kpis" id="kpis-eq"></div>
+    <div class="panel">
+      <div class="panel-head"><h3>Cost reduction from deviating</h3><span class="small muted">per device, in % of its starting cost</span></div>
+      <div class="legend" id="l-eq"></div>
+      <div class="chart" id="c-eq"></div>
+    </div>
+    <p class="muted" id="eq-note"></p>
+    <div class="panel">
+      <div class="panel-head"><h3>Per-device detail</h3><span class="small muted">cost per task before and after deviating · gain ± 95 % CI over paired episodes</span></div>
+      <div class="tbl-wrap"><table id="t-eq"></table></div>
+    </div>
+  </section>
+
+  <!-- ============================================================ REVUE -->
+  <section data-panel="revue" class="stack-lg" hidden>
+    <div class="stack">
+      <h2>Code review and fixes</h2>
+      <p class="muted">Each review finding, with what was changed and the measured effect. The "before" numbers come from the original results; the "after" numbers from the new run.</p>
+    </div>
+    <div class="filters">
+      <span class="small muted">Show:</span>
+      <div class="seg" role="group" aria-label="Filter findings">
+        <button id="r-all" data-r="all" aria-pressed="true">All</button>
+        <button id="r-fond" data-r="core" aria-pressed="false">Core</button>
+        <button id="r-modele" data-r="model" aria-pressed="false">Modelling</button>
+        <button id="r-code" data-r="code" aria-pressed="false">Engineering</button>
+      </div>
+    </div>
+    <div class="stack" id="findings"></div>
+  </section>
+
+  <footer>
+    <span>Ossama Sabti · ossamasabti.me</span>
+    <span>Generated from <code>results/*.json</code> by <code>scripts/report.py</code> · <span id="gen"></span></span>
+  </footer>
+</div>
+
+<div class="tip" id="tip" hidden></div>
+
+<script id="data" type="application/json">__DATA__</script>
+<script>
+const D = JSON.parse(document.getElementById("data").textContent);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const fmt = (v, d = 3) => (v == null || isNaN(v)) ? "–" : Number(v).toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
+const pct = (v, d = 0) => fmt(100 * v, d) + "%";
+const NS = "http://www.w3.org/2000/svg";
+const el = (tag, attrs = {}, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+const COL = { IQL: "--s1", IPPO: "--s2", MAPPO: "--s3", "greedy+toll": "--s4", greedy: "--base", random: "--base-soft" };
+const LEARNED = ["IQL", "IPPO", "MAPPO"];
+
+/* ---------- tooltip ---------- */
+const tip = document.getElementById("tip");
+function showTip(chartEl, x, y, html) {
+  tip.innerHTML = html; tip.hidden = false;
+  const r = chartEl.getBoundingClientRect(), tw = tip.offsetWidth, th = tip.offsetHeight;
+  let left = r.left + window.scrollX + x + 14, top = r.top + window.scrollY + y - th - 10;
+  if (left + tw > window.scrollX + document.documentElement.clientWidth - 8) left = r.left + window.scrollX + x - tw - 14;
+  if (top < window.scrollY + 8) top = r.top + window.scrollY + y + 14;
+  tip.style.left = left + "px"; tip.style.top = top + "px";
+}
+const hideTip = () => { tip.hidden = true; };
+const row = (color, name, val) => `<div class="row"><span><i style="background:${color}"></i>${name}</span><b>${val}</b></div>`;
+
+/* ---------- scales ---------- */
+function niceTicks(lo, hi, n = 5) {
+  const span = hi - lo, step0 = span / n, mag = Math.pow(10, Math.floor(Math.log10(step0)));
+  const step = [1, 2, 2.5, 5, 10].map(m => m * mag).find(s => span / s <= n) || 10 * mag;
+  const out = []; for (let v = Math.ceil(lo / step - 1e-9) * step; v <= hi + 1e-9; v += step) out.push(+v.toFixed(10));
+  return out;
+}
+function frame(container, H, m) {
+  container.innerHTML = "";
+  const W = Math.max(container.clientWidth, 300);
+  const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img" }, container);
+  return { svg, W, H, iw: W - m.l - m.r, ih: H - m.t - m.b, m };
+}
+
+/* ---------- line chart ---------- */
+function lineChart(container, o) {
+  const f = frame(container, o.height || 280, { l: 52, r: 16, t: 12, b: 38 });
+  const { svg, iw, ih, m } = f;
+  const all = o.series.flatMap(s => s.points.flatMap(p => [p[1], ...(s.band ? [] : [])]))
+    .concat(o.series.flatMap(s => s.band ? s.band.flatMap(b => [b[1], b[2]]) : []))
+    .concat((o.refs || []).map(r => r.y));
+  const xs = o.series.flatMap(s => s.points.map(p => p[0]));
+  const x0 = o.xDomain ? o.xDomain[0] : Math.min(...xs), x1 = o.xDomain ? o.xDomain[1] : Math.max(...xs);
+  let y0 = o.yDomain ? o.yDomain[0] : Math.min(...all), y1 = o.yDomain ? o.yDomain[1] : Math.max(...all);
+  if (!o.yDomain) { const pad = (y1 - y0) * 0.08 || 0.1; y0 -= pad; y1 += pad; }
+  const X = v => m.l + (v - x0) / (x1 - x0) * iw, Y = v => m.t + ih - (Math.min(Math.max(v, y0), y1) - y0) / (y1 - y0) * ih;
+  const g = el("g", {}, svg);
+  for (const t of niceTicks(y0, y1, 5)) {
+    el("line", { x1: m.l, x2: m.l + iw, y1: Y(t), y2: Y(t), stroke: css("--grid") }, g);
+    el("text", { x: m.l - 8, y: Y(t) + 4, "text-anchor": "end" }, g).textContent = o.yFmt ? o.yFmt(t) : fmt(t, 2);
+  }
+  for (const t of niceTicks(x0, x1, Math.max(3, Math.floor(iw / 90)))) {
+    el("text", { x: X(t), y: m.t + ih + 18, "text-anchor": "middle" }, g).textContent = o.xFmt ? o.xFmt(t) : t;
+  }
+  el("line", { x1: m.l, x2: m.l + iw, y1: m.t + ih, y2: m.t + ih, stroke: css("--rule") }, g);
+  if (o.xLabel) el("text", { x: m.l + iw / 2, y: f.H - 4, "text-anchor": "middle", class: "lbl" }, g).textContent = o.xLabel;
+  for (const r of o.refs || []) {
+    el("line", { x1: m.l, x2: m.l + iw, y1: Y(r.y), y2: Y(r.y), stroke: css(r.color), "stroke-width": 1.5, "stroke-dasharray": "5 4" }, g);
+    el("text", { x: m.l + iw - 4, y: Y(r.y) - 5, "text-anchor": "end", class: "lbl" }, g).textContent = r.label;
+  }
+  for (const v of o.vlines || []) {
+    el("line", { x1: X(v.x), x2: X(v.x), y1: m.t, y2: m.t + ih, stroke: css(v.color), "stroke-width": 1.5, "stroke-dasharray": "3 3" }, g);
+    el("text", { x: X(v.x) + 5, y: m.t + 11, class: "lbl" }, g).textContent = v.label;
+  }
+  for (const s of o.series) {
+    if (s.band) {
+      const d = s.band.map((b, i) => `${i ? "L" : "M"}${X(b[0])},${Y(b[2])}`).join("") + s.band.slice().reverse().map(b => `L${X(b[0])},${Y(b[1])}`).join("") + "Z";
+      el("path", { d, fill: css(s.color), opacity: 0.14 }, g);
+    }
+    const d = s.points.map((p, i) => `${i ? "L" : "M"}${X(p[0])},${Y(p[1])}`).join("");
+    el("path", { d, class: "line", fill: "none", stroke: css(s.color), "stroke-width": 2, "stroke-linejoin": "round", ...(s.dash ? { "stroke-dasharray": "5 4" } : {}) }, g);
+    if (s.dots) for (const p of s.points) el("circle", { cx: X(p[0]), cy: Y(p[1]), r: 3.5, fill: css(s.color), stroke: css("--surface"), "stroke-width": 2 }, g);
+  }
+  // hover crosshair
+  const cross = el("line", { y1: m.t, y2: m.t + ih, stroke: css("--ink-3"), "stroke-width": 1, visibility: "hidden" }, svg);
+  const dots = o.series.map(s => el("circle", { r: 4.5, fill: css(s.color), stroke: css("--surface"), "stroke-width": 2, visibility: "hidden" }, svg));
+  const hit = el("rect", { x: m.l, y: m.t, width: iw, height: ih, fill: "transparent" }, svg);
+  const move = ev => {
+    const pt = svg.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY;
+    const p = pt.matrixTransform(svg.getScreenCTM().inverse());
+    const xv = x0 + (p.x - m.l) / iw * (x1 - x0);
+    const ref = o.series[0].points; let best = 0;
+    ref.forEach((q, i) => { if (Math.abs(q[0] - xv) < Math.abs(ref[best][0] - xv)) best = i; });
+    const xx = ref[best][0];
+    cross.setAttribute("x1", X(xx)); cross.setAttribute("x2", X(xx)); cross.setAttribute("visibility", "visible");
+    let html = `<b>${o.xTip ? o.xTip(xx) : xx}</b>`;
+    o.series.forEach((s, i) => {
+      const q = s.points.find(q => q[0] === xx) || s.points[best];
+      if (!q) return;
+      dots[i].setAttribute("cx", X(q[0])); dots[i].setAttribute("cy", Y(q[1])); dots[i].setAttribute("visibility", "visible");
+      html += row(css(s.color), s.name, o.yTip ? o.yTip(q[1]) : fmt(q[1]));
+    });
+    const r = container.getBoundingClientRect(), sc = r.width / f.W;
+    showTip(container, X(xx) * sc, m.t * sc + 20, html);
+  };
+  hit.addEventListener("pointermove", move);
+  hit.addEventListener("pointerleave", () => { cross.setAttribute("visibility", "hidden"); dots.forEach(d => d.setAttribute("visibility", "hidden")); hideTip(); });
+}
+
+/* ---------- horizontal bar chart (one measure) ---------- */
+function hbarChart(container, o) {
+  const rowH = 30, H = o.items.length * rowH + 34;
+  const f = frame(container, H, { l: o.labelW || 110, r: 64, t: 6, b: 28 });
+  const { svg, iw, ih, m } = f;
+  const vmax = o.max ?? Math.max(...o.items.map(d => d.value + (d.err || 0))) * 1.05;
+  const X = v => m.l + Math.min(v, vmax) / vmax * iw;
+  for (const t of niceTicks(0, vmax, Math.max(3, Math.floor(iw / 80)))) {
+    el("line", { x1: X(t), x2: X(t), y1: m.t, y2: m.t + ih, stroke: css("--grid") }, svg);
+    el("text", { x: X(t), y: H - 10, "text-anchor": "middle" }, svg).textContent = fmt(t, 1);
+  }
+  o.items.forEach((d, i) => {
+    const y = m.t + i * rowH + 5, h = rowH - 10;
+    const lbl = el("text", { x: m.l - 10, y: y + h / 2 + 4, "text-anchor": "end", class: "lbl" }, svg);
+    lbl.textContent = d.label; if (d.strong) lbl.setAttribute("font-weight", "600");
+    const w = Math.max(X(d.value) - m.l, 2);
+    el("path", { d: `M${m.l},${y}h${w - 4}a4,4 0 0 1 4,4v${h - 8}a4,4 0 0 1 -4,4h${-(w - 4)}Z`, fill: css(d.color) }, svg);
+    if (d.err) {
+      const a = X(d.value - d.err), b = X(d.value + d.err), cy = y + h / 2;
+      el("line", { x1: a, x2: b, y1: cy, y2: cy, stroke: css("--ink"), "stroke-width": 1.5 }, svg);
+      el("line", { x1: a, x2: a, y1: cy - 5, y2: cy + 5, stroke: css("--ink"), "stroke-width": 1.5 }, svg);
+      el("line", { x1: b, x2: b, y1: cy - 5, y2: cy + 5, stroke: css("--ink"), "stroke-width": 1.5 }, svg);
+    }
+    const tx = d.value > vmax ? m.l + iw + 6 : X(d.value + (d.err || 0)) + 6;
+    el("text", { x: tx, y: y + h / 2 + 4, class: "lbl" }, svg).textContent = d.value > vmax ? `${fmt(d.value, 2)} →` : fmt(d.value, 3);
+    const hit = el("rect", { x: 0, y: y - 4, width: f.W, height: rowH, fill: "transparent" }, svg);
+    hit.addEventListener("pointermove", ev => { const r = container.getBoundingClientRect(); showTip(container, ev.clientX - r.left, ev.clientY - r.top, d.tip); });
+    hit.addEventListener("pointerleave", hideTip);
+  });
+}
+
+/* ---------- grouped vertical bars ---------- */
+function groupedBars(container, o) {
+  const f = frame(container, o.height || 260, { l: 46, r: 10, t: 10, b: 44 });
+  const { svg, iw, ih, m } = f;
+  const vmax = o.max ?? Math.max(...o.series.flatMap(s => s.values)) * 1.1;
+  const Y = v => m.t + ih - v / vmax * ih;
+  for (const t of niceTicks(0, vmax, 4)) {
+    el("line", { x1: m.l, x2: m.l + iw, y1: Y(t), y2: Y(t), stroke: css("--grid") }, svg);
+    el("text", { x: m.l - 8, y: Y(t) + 4, "text-anchor": "end" }, svg).textContent = o.yFmt(t);
+  }
+  const gw = iw / o.groups.length, inner = gw * 0.78, bw = inner / o.series.length;
+  o.groups.forEach((gname, gi) => {
+    const gx = m.l + gi * gw + (gw - inner) / 2;
+    o.series.forEach((s, si) => {
+      const v = s.values[gi], x = gx + si * bw + 1, w = Math.max(bw - 2, 2), y = Y(Math.max(v, 0)), h = m.t + ih - y;
+      if (h > 4) el("path", { d: `M${x},${m.t + ih}v${-(h - 4)}a4,4 0 0 1 4,-4h${w - 8}a4,4 0 0 1 4,4v${h - 4}Z`, fill: css(s.color) }, svg);
+      else el("rect", { x, y: m.t + ih - Math.max(h, 1), width: w, height: Math.max(h, 1), fill: css(s.color) }, svg);
+    });
+    const [a, b] = gname.split("\n");
+    el("text", { x: gx + inner / 2, y: m.t + ih + 16, "text-anchor": "middle", class: "lbl" }, svg).textContent = a;
+    if (b) el("text", { x: gx + inner / 2, y: m.t + ih + 30, "text-anchor": "middle" }, svg).textContent = b;
+    const hit = el("rect", { x: m.l + gi * gw, y: m.t, width: gw, height: ih, fill: "transparent" }, svg);
+    hit.addEventListener("pointermove", ev => {
+      const r = container.getBoundingClientRect();
+      showTip(container, ev.clientX - r.left, ev.clientY - r.top, `<b>${gname.replace("\n", " · ")}</b>` + o.series.map(s => row(css(s.color), s.name, o.yFmt(s.values[gi]))).join(""));
+    });
+    hit.addEventListener("pointerleave", hideTip);
+  });
+  el("line", { x1: m.l, x2: m.l + iw, y1: m.t + ih, y2: m.t + ih, stroke: css("--rule") }, svg);
+}
+
+function legend(target, items) {
+  const nodes = typeof target === "string" ? document.querySelectorAll(target) : [target];
+  nodes.forEach(n => n.innerHTML = items.map(it => `<span><i class="${it.kind || ""}" style="--c:var(${it.color});background:var(${it.color})"></i>${it.name}</span>`).join(""));
+}
+
+/* ================================================================ content */
+const F = D.final;
+document.getElementById("delay").textContent = D.signal_delay;
+document.getElementById("gen").textContent = D.generated;
+
+function kpis(target, items) {
+  document.getElementById(target).innerHTML = items.map(k => `<div class="kpi"><span class="v">${k.v}</span><span class="l">${k.l}</span></div>`).join("");
+}
+const bestLearned = LEARNED.reduce((a, b) => F[a].cost_per_task < F[b].cost_per_task ? a : b);
+const gain = 1 - F[bestLearned].cost_per_task / F.greedy.cost_per_task;
+kpis("kpis", [
+  { v: fmt(F[bestLearned].cost_per_task, 3), l: `best learner (${bestLearned}), cost per task` },
+  { v: "−" + pct(gain, 1), l: "against the myopic greedy rule" },
+  { v: fmt(F["greedy+toll"].cost_per_task, 3), l: `greedy with a virtual toll of ${fmt(F["greedy+toll"].toll, 1)}` },
+  { v: String(F.IQL.seeds.length), l: "training seeds per method" },
+]);
+
+/* diagram */
+function drawDiagram() {
+  const box = document.getElementById("diagram"); box.innerHTML = "";
+  const W = 760, H = 250, svg = el("svg", { viewBox: `0 0 ${W} ${H}` }, box);
+  const speeds = D.speeds;
+  speeds.forEach((s, i) => {
+    const y = 18 + i * 37;
+    el("rect", { x: 10, y, width: 150, height: 28, rx: 5, fill: css("--surface"), stroke: css("--rule") }, svg);
+    el("rect", { x: 10, y, width: 150 * s / 1.2, height: 28, rx: 5, fill: css("--s1"), opacity: 0.16 }, svg);
+    el("text", { x: 20, y: y + 18 }, svg).textContent = `device ${i} · CPU ${s}`;
+    el("path", { d: `M160,${y + 14} C 260,${y + 14} 260,95 360,95`, fill: "none", stroke: css("--s2"), "stroke-width": 1.2, opacity: 0.7 }, svg);
+    el("path", { d: `M160,${y + 14} C 280,${y + 14} 300,205 520,205`, fill: "none", stroke: css("--s3"), "stroke-width": 1, opacity: 0.45, "stroke-dasharray": "4 4" }, svg);
+  });
+  el("rect", { x: 360, y: 60, width: 250, height: 70, rx: 8, fill: css("--surface"), stroke: css("--s2"), "stroke-width": 1.5 }, svg);
+  for (let k = 0; k < 7; k++) el("rect", { x: 372 + k * 22, y: 80, width: 18, height: 30, rx: 3, fill: css("--s2"), opacity: 0.25 + 0.1 * (k % 3) }, svg);
+  el("text", { x: 540, y: 92, "font-weight": 600 }, svg).textContent = "Edge";
+  el("text", { x: 540, y: 110 }, svg).textContent = "3 units / step";
+  el("text", { x: 372, y: 148 }, svg).textContent = "shared FIFO queue, persists across steps";
+  el("rect", { x: 520, y: 182, width: 160, height: 46, rx: 8, fill: css("--surface"), stroke: css("--s3"), "stroke-width": 1.5 }, svg);
+  el("text", { x: 534, y: 202, "font-weight": 600 }, svg).textContent = "Cloud";
+  el("text", { x: 534, y: 219 }, svg).textContent = "+1.5 steps · fee 0.3";
+  el("path", { d: "M610,95 C 690,95 700,40 640,30", fill: "none", stroke: css("--ink-3"), "stroke-dasharray": "3 3" }, svg);
+  el("text", { x: 618, y: 24 }, svg).textContent = `load signal, delay ${D.signal_delay}`;
+}
+
+/* results */
+document.getElementById("res-lede").textContent =
+  `The three learners beat the myopic greedy rule (${fmt(F.greedy.cost_per_task)}). ` +
+  `But a greedy rule that adds a virtual toll of ${fmt(F["greedy+toll"].toll, 1)} to the edge, tuned on separate seeds, reaches ${fmt(F["greedy+toll"].cost_per_task)}. ` +
+  (LEARNED.every(n => F[n].cost_per_task > F["greedy+toll"].cost_per_task)
+    ? `No learner does better: most of the gain comes from internalising congestion, which a simple rule already captures.`
+    : `${bestLearned} does better than this baseline.`);
+
+const order = ["all-edge", "all-local", "all-cloud", "random", "greedy", "greedy+toll", ...LEARNED];
+const barCol = n => COL[n] || "--base-soft";
+function drawFinal() {
+  hbarChart(document.getElementById("c-final"), {
+    max: 4.6, labelW: 96,
+    items: order.map(n => ({
+      label: n, value: F[n].cost_per_task, err: F[n].cost_per_task_ci95, color: barCol(n), strong: LEARNED.includes(n),
+      tip: `<b>${n}</b>` + row(css(barCol(n)), "cost / task", fmt(F[n].cost_per_task)) +
+        (F[n].cost_per_task_ci95 != null ? row(css("--ink-3"), "IC 95 %", "± " + fmt(F[n].cost_per_task_ci95)) : "") +
+        row(css("--ink-3"), "latency", fmt(F[n].latency_per_task)) + row(css("--ink-3"), "energy", fmt(F[n].energy_per_task)) +
+        row(css("--ink-3"), "mean edge queue", fmt(F[n].mean_edge_backlog, 2)) +
+        (F[n].cost_per_task_per_seed ? row(css("--ink-3"), "per seed", F[n].cost_per_task_per_seed.map(v => fmt(v, 2)).join(" · ")) : ""),
+    })),
+  });
+}
+function drawCurves() {
+  legend(document.getElementById("l-curves"), [...LEARNED.map(n => ({ name: n, color: COL[n] })),
+    { name: "greedy", color: "--base", kind: "dash" }, { name: "greedy+toll", color: "--s4", kind: "dash" }]);
+  lineChart(document.getElementById("c-curves"), {
+    height: 300, yDomain: [1.3, 2.3],
+    series: LEARNED.map(n => ({ name: n, color: COL[n], points: D.curves[n].map(p => [p[0], p[1]]), band: D.curves[n].map(p => [p[0], p[1] - p[2], p[1] + p[2]]) })),
+    refs: [{ y: F.greedy.cost_per_task, color: "--base", label: "greedy" }, { y: F["greedy+toll"].cost_per_task, color: "--s4", label: "greedy+toll" }],
+    xLabel: "experience (thousands of agent-steps)", xFmt: v => fmt(v / 1000, 0), xTip: v => `${fmt(v / 1000, 0)}k agent-steps`,
+  });
+}
+function drawAgents() {
+  const names = Object.keys(D.per_agent);
+  legend(document.getElementById("l-agents"), names.map(n => ({ name: n, color: COL[n], kind: "box" })));
+  groupedBars(document.getElementById("c-agents"), {
+    groups: D.speeds.map((s, i) => `dev. ${i}\nCPU ${s}`),
+    series: names.map(n => ({ name: n, color: COL[n], values: D.per_agent[n] })), max: 1, yFmt: v => pct(v),
+  });
+  const m = D.per_agent.MAPPO, g = D.per_agent.greedy, t = D.per_agent["greedy+toll"];
+  document.getElementById("agents-note").textContent =
+    `All policies give the shared server mostly to the slow devices. With MAPPO, the slowest device sends ${pct(m[0])} of its tasks there and the fastest ${pct(m[m.length - 1])}; ` +
+    `with greedy, ${pct(g[0])} against ${pct(g[g.length - 1])}. The toll reduces edge use for everybody (${pct(t[0])} against ${pct(t[t.length - 1])}). Learned policies: mean over all seeds.`;
+}
+function drawTable() {
+  const cols = [["cost_per_task", "cost / task", 3], ["cost_per_task_ci95", "95% CI", 3], ["latency_per_task", "latency", 3], ["energy_per_task", "energy", 3], ["share_local", "local", 2], ["share_edge", "edge", 2], ["share_cloud", "cloud", 2], ["mean_edge_backlog", "edge queue", 2]];
+  const best = Math.min(...order.map(n => F[n].cost_per_task));
+  document.getElementById("t-final").innerHTML = `<thead><tr><th>policy</th>${cols.map(c => `<th>${c[1]}</th>`).join("")}</tr></thead><tbody>` +
+    order.map(n => `<tr class="${LEARNED.includes(n) ? "learned" : ""} ${F[n].cost_per_task === best ? "best" : ""}"><td>${n}</td>${cols.map(c => `<td>${F[n][c[0]] == null ? "–" : (c[0] === "cost_per_task_ci95" ? "± " : "") + fmt(F[n][c[0]], c[2])}</td>`).join("")}</tr>`).join("") + "</tbody>";
+}
+
+/* leader */
+const S = D.stackelberg, SW = S.sweep, SU = S.summary;
+kpis("kpis-leader", [
+  { v: fmt(SU.bandit_price, 1), l: `price chosen by the bandit (${pct(SU.bandit_share_of_plays)} of episodes)` },
+  { v: fmt(SU.sweep_optimal_price, 1), l: "best price in the exhaustive sweep" },
+  { v: fmt(SU.social_optimal_price, 1), l: "price that minimises the social cost (MAPPO followers)" },
+  { v: fmt(SU.social_optimal_price_greedy, 1), l: "same with greedy followers" },
+]);
+let followFilter = "both";
+function sweepSeries(key) {
+  const keys = followFilter === "both" ? ["learned", "greedy"] : [followFilter];
+  return keys.map(k => ({ name: k === "learned" ? "MAPPO followers" : "greedy followers", color: k === "learned" ? "--s3" : "--base", dots: true,
+    points: SW.price.map((p, i) => [p, SW[k][i][key]]) }));
+}
+function drawLeader() {
+  const keys = followFilter === "both" ? ["learned", "greedy"] : [followFilter];
+  legend(".l-sweep", keys.map(k => ({ name: k === "learned" ? "MAPPO followers" : "greedy followers", color: k === "learned" ? "--s3" : "--base" })));
+  const common = { height: 250, xLabel: "posted edge price", xFmt: v => fmt(v, 1), xTip: v => `price ${fmt(v, 1)}` };
+  lineChart(document.getElementById("c-payoff"), { ...common, series: sweepSeries("leader_payoff"), vlines: [{ x: SU.bandit_price, color: "--s2", label: "UCB choice" }] });
+  lineChart(document.getElementById("c-social"), { ...common, series: sweepSeries("social_cost_per_task"), vlines: [{ x: SU.social_optimal_price, color: "--s1", label: "social optimum" }] });
+  lineChart(document.getElementById("c-share"), { ...common, series: sweepSeries("share_edge"), yFmt: v => pct(v), yTip: v => pct(v, 1) });
+  const counts = SW.price.map(p => S.bandit_choices.filter(c => Math.abs(c - p) < 1e-6).length);
+  groupedBars(document.getElementById("c-bandit"), { height: 200, groups: SW.price.map(p => fmt(p, 1)), series: [{ name: "episodes", color: "--s2", values: counts }], yFmt: v => fmt(v, 0) });
+}
+const l0 = SW.learned[0].social_cost_per_task, li = SW.price.indexOf(SU.social_optimal_price), lopt = SW.learned[li].social_cost_per_task;
+document.getElementById("social-note").textContent =
+  `Counting the fee, the best price for the devices is trivially 0. But the fee is only a transfer to the operator. Without the transfer, a price of ${fmt(SU.social_optimal_price, 1)} lowers the social cost from ${fmt(l0)} to ${fmt(lopt)} (−${pct(1 - lopt / l0, 1)}): the price acts as a congestion toll. The operator chooses ${fmt(SU.sweep_optimal_price, 1)}.`;
+document.getElementById("bandit-sub").textContent = `${S.bandit_choices.length} episodes · 16 prices from 0 to 3`;
+
+/* equilibrium */
+const E = D.exploitability || {};
+const eqNames = ["greedy", "greedy+toll", "IQL", "IPPO", "MAPPO"].filter(n => E[n]);
+function drawEq() {
+  const any = eqNames[0];
+  const seedsTxt = eqNames.filter(n => !["greedy", "greedy+toll"].includes(n)).map(n => `${n}: ${E[n].seeds.length} seed${E[n].seeds.length > 1 ? "s" : ""}`).join(" · ");
+  document.getElementById("eq-method").textContent =
+    `${E[any].eval_episodes} paired evaluation episodes per device. ${seedsTxt}. The greedy rules do not depend on a seed.`;
+  kpis("kpis-eq", eqNames.map(n => ({ v: fmt(E[n].nash_conv, 3), l: `NashConv · ${n} (mean gain ${pct(E[n].mean_relative_gain, 1)})` })));
+  legend(document.getElementById("l-eq"), eqNames.map(n => ({ name: n, color: COL[n], kind: "box" })));
+  groupedBars(document.getElementById("c-eq"), {
+    groups: E[any].per_agent.map(r => `dev. ${r.agent}\nCPU ${r.cpu}`),
+    series: eqNames.map(n => ({ name: n, color: COL[n], values: E[n].per_agent.map(r => Math.max(0, r.gain) / r.cost_before) })),
+    yFmt: v => pct(v, 1),
+  });
+  const best = eqNames.reduce((a, b) => E[a].nash_conv < E[b].nash_conv ? a : b);
+  const worst = eqNames.reduce((a, b) => E[a].nash_conv > E[b].nash_conv ? a : b);
+  const nc = eqNames.filter(n => Object.values(E[n].not_converged).some(l => l.length));
+  document.getElementById("eq-note").textContent =
+    `${best} is the policy closest to an equilibrium (NashConv ${fmt(E[best].nash_conv)}), ${worst} the farthest (${fmt(E[worst].nash_conv)}). ` +
+    (nc.length ? `For ${nc.join(", ")}, the last PPO iterate of some devices does worse than the starting policy ("best response did not converge"); the selected checkpoint is still at least as good on validation.` : "For every device, the last PPO iterate does at least as well as the starting policy.");
+  document.getElementById("t-eq").innerHTML = `<thead><tr><th>policy</th><th>device</th><th>before</th><th>after</th><th>gain</th><th>95% CI</th><th>converged</th></tr></thead><tbody>` +
+    eqNames.flatMap(n => E[n].per_agent.map(r => `<tr><td>${n}</td><td>${r.agent} (CPU ${r.cpu})</td><td>${fmt(r.cost_before)}</td><td>${fmt(r.cost_after)}</td><td>${r.gain >= 0 ? "+" : ""}${fmt(r.gain)}</td><td>± ${fmt(r.gain_ci95)}</td><td>${r.converged_all_seeds ? "yes" : "no"}</td></tr>`)).join("") + "</tbody>";
+}
+
+/* review */
+const STATUS = { fixed: ["fixed", "fixed"], doc: ["doc", "documented"], todo: ["todo", "to do"] };
+let revFilter = "all";
+function drawFindings() {
+  const list = D.findings.filter(f => revFilter === "all" || f.cat === revFilter);
+  document.getElementById("findings").innerHTML = list.map(f => `
+    <article class="finding">
+      <span class="num">${String(f.n).padStart(2, "0")}</span>
+      <div class="body">
+        <div class="ttl"><h3>${f.title}</h3><span class="chip ${STATUS[f.status][0]}">${STATUS[f.status][1]}</span><span class="chip sev">${f.sev}</span></div>
+        <p class="small muted">${f.problem}</p>
+        <div class="ba"><div><span class="k">Before</span><div>${f.before}</div></div><div><span class="k">After</span><div>${f.after}</div></div></div>
+        <span class="files">${f.files}</span>
+      </div>
+    </article>`).join("");
+}
+document.getElementById("fix-count").textContent = `${D.findings.filter(f => f.status === "fixed").length}/${D.findings.length}`;
+
+/* ---------- views ---------- */
+const views = ["apercu", "resultats", "leader", "equilibre", "revue"].filter(v => v !== "equilibre" || eqNames.length);
+if (!eqNames.length) document.getElementById("tab-equilibre").hidden = true;  // analysis not finished: hide the tab
+const drawn = {};
+const drawers = { apercu: drawDiagram, resultats: () => { drawFinal(); drawCurves(); drawAgents(); drawTable(); }, leader: drawLeader, equilibre: drawEq, revue: drawFindings };
+function show(v) {
+  if (!views.includes(v)) v = "apercu";
+  document.querySelectorAll("[data-panel]").forEach(p => p.hidden = p.dataset.panel !== v);
+  document.querySelectorAll("nav.tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.view === v));
+  if (drawers[v]) drawers[v]();
+  drawn[v] = true; hideTip();
+}
+document.querySelectorAll("nav.tabs button").forEach(b => b.addEventListener("click", () => { location.hash = b.dataset.view; }));
+window.addEventListener("hashchange", () => show(location.hash.slice(1)));
+document.querySelectorAll("[data-f]").forEach(b => b.addEventListener("click", () => {
+  followFilter = b.dataset.f; document.querySelectorAll("[data-f]").forEach(x => x.setAttribute("aria-pressed", x === b)); drawLeader();
+}));
+document.querySelectorAll("[data-r]").forEach(b => b.addEventListener("click", () => {
+  revFilter = b.dataset.r; document.querySelectorAll("[data-r]").forEach(x => x.setAttribute("aria-pressed", x === b)); drawFindings();
+}));
+let rt; window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => show(location.hash.slice(1)), 150); });
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => show(location.hash.slice(1)));
+new MutationObserver(() => show(location.hash.slice(1))).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+show(location.hash.slice(1));
+</script>

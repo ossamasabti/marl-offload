@@ -1,9 +1,4 @@
-import os
-import sys
-
 import numpy as np
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from marl_offload.baselines import FixedPolicy, GreedyPolicy, evaluate
 from marl_offload.env import CLOUD, EDGE, LOCAL, EnvConfig, OffloadEnv

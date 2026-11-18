@@ -247,7 +247,8 @@ footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--rule);
   <section data-panel="equilibre" class="stack-lg" hidden>
     <div class="stack">
       <h2>Est-ce un équilibre de Nash ?</h2>
-      <p class="muted">Pour chaque appareil, on fige les cinq autres sur la politique conjointe, puis on entraîne une meilleure réponse (PPO, 200 mises à jour). Si aucun appareil ne gagne à dévier, la politique est un équilibre. La somme des gains (NashConv) mesure la distance à l’équilibre. La meilleure réponse est apprise, donc ces gains sont des bornes inférieures.</p>
+      <p class="muted">Pour chaque appareil, on fige les cinq autres sur la politique conjointe, puis on entraîne une meilleure réponse avec PPO. Pour les politiques apprises, la meilleure réponse part de la politique actuelle de l’appareil et l’affine ; pour les règles, elle part de zéro et s’entraîne plus longtemps. Le meilleur point de contrôle est choisi sur des épisodes de validation, la politique de départ faisant partie des candidats. Avant et après sont évalués sur les mêmes épisodes. Si aucun appareil ne gagne à dévier, la politique est un équilibre ; la somme des gains positifs (NashConv) mesure la distance à l’équilibre. La meilleure réponse est apprise, donc ces gains restent des bornes inférieures.</p>
+      <p class="small muted" id="eq-method"></p>
     </div>
     <div class="kpis" id="kpis-eq"></div>
     <div class="panel">
@@ -256,6 +257,10 @@ footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--rule);
       <div class="chart" id="c-eq"></div>
     </div>
     <p class="muted" id="eq-note"></p>
+    <div class="panel">
+      <div class="panel-head"><h3>Détail par appareil</h3><span class="small muted">coût par tâche avant et après déviation · gain ± IC 95 % sur les épisodes appariés</span></div>
+      <div class="tbl-wrap"><table id="t-eq"></table></div>
+    </div>
   </section>
 
   <!-- ============================================================ REVUE -->
@@ -581,26 +586,25 @@ document.getElementById("bandit-sub").textContent = `${S.bandit_choices.length} 
 const E = D.exploitability || {};
 const eqNames = ["greedy", "greedy+toll", "IQL", "IPPO", "MAPPO"].filter(n => E[n]);
 function drawEq() {
-  const pending = ["greedy", "greedy+toll", "IQL", "IPPO", "MAPPO"].filter(n => !E[n]);
-  if (!eqNames.length) {
-    kpis("kpis-eq", [{ v: "En cours", l: "calcul des meilleures réponses (5 politiques × 6 appareils)" }]);
-    document.getElementById("eq-note").textContent = "Les résultats apparaîtront ici dès la fin du calcul.";
-    document.getElementById("c-eq").closest(".panel").hidden = true;
-    return;
-  }
-  document.getElementById("c-eq").closest(".panel").hidden = false;
+  const any = eqNames[0];
+  const seedsTxt = eqNames.filter(n => !["greedy", "greedy+toll"].includes(n)).map(n => `${n} : ${E[n].seeds.length} graine${E[n].seeds.length > 1 ? "s" : ""}`).join(" · ");
+  document.getElementById("eq-method").textContent =
+    `${E[any].eval_episodes} épisodes d’évaluation appariés par appareil. ${seedsTxt}. Les règles greedy ne dépendent pas d’une graine.`;
   kpis("kpis-eq", eqNames.map(n => ({ v: fmt(E[n].nash_conv, 3), l: `NashConv · ${n} (gain moyen ${pct(E[n].mean_relative_gain, 1)})` })));
   legend(document.getElementById("l-eq"), eqNames.map(n => ({ name: n, color: COL[n], kind: "box" })));
   groupedBars(document.getElementById("c-eq"), {
-    groups: E[eqNames[0]].per_agent.map(r => `app. ${r.agent}\nCPU ${String(r.cpu).replace(".", ",")}`),
-    series: eqNames.map(n => ({ name: n, color: COL[n], values: E[n].per_agent.map(r => r.gain / r.cost_before) })),
+    groups: E[any].per_agent.map(r => `app. ${r.agent}\nCPU ${String(r.cpu).replace(".", ",")}`),
+    series: eqNames.map(n => ({ name: n, color: COL[n], values: E[n].per_agent.map(r => Math.max(0, r.gain) / r.cost_before) })),
     yFmt: v => pct(v, 1),
   });
   const best = eqNames.reduce((a, b) => E[a].nash_conv < E[b].nash_conv ? a : b);
   const worst = eqNames.reduce((a, b) => E[a].nash_conv > E[b].nash_conv ? a : b);
+  const nc = eqNames.filter(n => Object.values(E[n].not_converged).some(l => l.length));
   document.getElementById("eq-note").textContent =
     `${best} est la politique la plus proche d’un équilibre (NashConv ${fmt(E[best].nash_conv)}), ${worst} la plus éloignée (${fmt(E[worst].nash_conv)}). ` +
-    `Modèles analysés : graine ${D.exploitability_seed}.` + (pending.length ? ` Non mesuré en entier : ${pending.join(", ")}.` : "") + (D.exploitability_note ? " " + D.exploitability_note : "");
+    (nc.length ? `Pour ${nc.join(", ")}, le dernier itéré PPO de certains appareils fait pire que la politique de départ (« best response did not converge ») ; le point de contrôle retenu reste au moins aussi bon sur la validation.` : "Pour tous les appareils, le dernier itéré PPO fait au moins aussi bien que la politique de départ.");
+  document.getElementById("t-eq").innerHTML = `<thead><tr><th>politique</th><th>appareil</th><th>avant</th><th>après</th><th>gain</th><th>IC 95 %</th><th>convergé</th></tr></thead><tbody>` +
+    eqNames.flatMap(n => E[n].per_agent.map(r => `<tr><td>${n}</td><td>${r.agent} (CPU ${String(r.cpu).replace(".", ",")})</td><td>${fmt(r.cost_before)}</td><td>${fmt(r.cost_after)}</td><td>${r.gain >= 0 ? "+" : ""}${fmt(r.gain)}</td><td>± ${fmt(r.gain_ci95)}</td><td>${r.converged_all_seeds ? "oui" : "non"}</td></tr>`)).join("") + "</tbody>";
 }
 
 /* review */
@@ -622,7 +626,8 @@ function drawFindings() {
 document.getElementById("fix-count").textContent = `${D.findings.filter(f => f.status === "fixed").length}/${D.findings.length}`;
 
 /* ---------- views ---------- */
-const views = ["apercu", "resultats", "leader", "equilibre", "revue"];
+const views = ["apercu", "resultats", "leader", "equilibre", "revue"].filter(v => v !== "equilibre" || eqNames.length);
+if (!eqNames.length) document.getElementById("tab-equilibre").hidden = true;  // analysis not finished: hide the tab
 const drawn = {};
 const drawers = { apercu: drawDiagram, resultats: () => { drawFinal(); drawCurves(); drawAgents(); drawTable(); }, leader: drawLeader, equilibre: drawEq, revue: drawFindings };
 function show(v) {
