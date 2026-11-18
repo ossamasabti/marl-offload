@@ -1,0 +1,162 @@
+{
+  "all-local": {
+    "cost_per_task": 4.3068402030457875,
+    "latency_per_task": 3.912218232335522,
+    "energy_per_task": 0.394621970710258,
+    "social_cost_per_task": 4.3068402030457875,
+    "revenue_per_step": 0.0,
+    "mean_edge_backlog": 0.0,
+    "share_local": 1.0,
+    "share_edge": 0.0,
+    "share_cloud": 0.0
+  },
+  "all-edge": {
+    "cost_per_task": 16.44506405225403,
+    "latency_per_task": 16.266270399668844,
+    "energy_per_task": 0.17879365258520724,
+    "social_cost_per_task": 16.44506405225403,
+    "revenue_per_step": 0.0,
+    "mean_edge_backlog": 45.77317556130395,
+    "share_local": 0.0,
+    "share_edge": 1.0,
+    "share_cloud": 0.0
+  },
+  "all-cloud": {
+    "cost_per_task": 2.6906489806677243,
+    "latency_per_task": 2.2081852688968127,
+    "energy_per_task": 0.1824637117709104,
+    "social_cost_per_task": 2.6906489806677243,
+    "revenue_per_step": 0.0,
+    "mean_edge_backlog": 0.0,
+    "share_local": 0.0,
+    "share_edge": 0.0,
+    "share_cloud": 1.0
+  },
+  "random": {
+    "cost_per_task": 1.927445400964641,
+    "latency_per_task": 1.574198054896965,
+    "energy_per_task": 0.2530265495337689,
+    "social_cost_per_task": 1.927445400964641,
+    "revenue_per_step": 0.0,
+    "mean_edge_backlog": 0.11833615682756135,
+    "share_local": 0.3328611898016997,
+    "share_edge": 0.3330694884185969,
+    "share_cloud": 0.3340693217797034
+  },
+  "greedy": {
+    "cost_per_task": 1.7016107019657245,
+    "latency_per_task": 1.4343963990154287,
+    "energy_per_task": 0.2651302763280008,
+    "social_cost_per_task": 1.7016107019657245,
+    "revenue_per_step": 0.0,
+    "mean_edge_backlog": 1.5232595929334727,
+    "share_local": 0.4562811980033278,
+    "share_edge": 0.5367720465890183,
+    "share_cloud": 0.00694675540765391
+  },
+  "greedy+toll": {
+    "cost_per_task": 1.483988184160373,
+    "latency_per_task": 1.1903294837432197,
+    "energy_per_task": 0.29208350351754025,
+    "social_cost_per_task": 1.483988184160373,
+    "revenue_per_step": 0.0,
+    "mean_edge_backlog": 0.3682025536453865,
+    "share_local": 0.6405384006334125,
+    "share_edge": 0.354210943034546,
+    "share_cloud": 0.005250656332041505,
+    "toll": 0.8,
+    "toll_tuning": {
+      "0.0": 1.7106418337207674,
+      "0.1": 1.6400506957526089,
+      "0.2": 1.6056295160275,
+      "0.3": 1.5810380836418072,
+      "0.4": 1.5475830796473262,
+      "0.5": 1.5393535781736727,
+      "0.6": 1.5270149747603248,
+      "0.7": 1.4975199086893087,
+      "0.8": 1.4807005152607833,
+      "0.9": 1.48795537151641,
+      "1.0": 1.5068827904599316,
+      "1.1": 1.5354895622924474,
+      "1.2": 1.5798732734818903
+    }
+  },
+  "IQL": {
+    "cost_per_task": 1.529409631357178,
+    "latency_per_task": 1.264948361354694,
+    "energy_per_task": 0.2644437488307611,
+    "social_cost_per_task": 1.529409631357178,
+    "revenue_per_step": 0.0,
+    "mean_edge_backlog": 1.0376280097051647,
+    "share_local": 0.513554077929465,
+    "share_edge": 0.48638751816480025,
+    "share_cloud": 5.8403905734739925e-05,
+    "cost_per_task_per_seed": [
+      1.562451345810325,
+      1.5673690041022184,
+      1.475718724754598,
+      1.546397988411905,
+      1.495111093706843
+    ],
+    "cost_per_task_ci95": 0.051562728828055494,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ]
+  },
+  "IPPO": {
+    "cost_per_task": 1.4922012085832157,
+    "latency_per_task": 1.2163410094329434,
+    "energy_per_task": 0.27586019915027415,
+    "social_cost_per_task": 1.4922012085832157,
+    "revenue_per_step": 0.0,
+    "mean_edge_backlog": 0.7892983975892867,
+    "share_local": 0.5493346521674263,
+    "share_edge": 0.4506653478325737,
+    "share_cloud": 0.0,
+    "cost_per_task_per_seed": [
+      1.467596622463305,
+      1.494165345922211,
+      1.4949023013757052,
+      1.5021947096156105,
+      1.5021470635392478
+    ],
+    "cost_per_task_ci95": 0.017749918911496288,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ]
+  },
+  "MAPPO": {
+    "cost_per_task": 1.5256272290317319,
+    "latency_per_task": 1.2549892930979785,
+    "energy_per_task": 0.27063793593375196,
+    "social_cost_per_task": 1.5256272290317319,
+    "revenue_per_step": 0.0,
+    "mean_edge_backlog": 0.9880466698681477,
+    "share_local": 0.5255070527277264,
+    "share_edge": 0.47449294727227354,
+    "share_cloud": 0.0,
+    "cost_per_task_per_seed": [
+      1.4931737814174395,
+      1.5255851578492732,
+      1.529703251509282,
+      1.5654603506220262,
+      1.514213603760639
+    ],
+    "cost_per_task_ci95": 0.032815721076064536,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ]
+  }
+}

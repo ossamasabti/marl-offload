@@ -1,0 +1,34 @@
+[MAPPO] update    0  cost/task 2.553  shares L/E/C 0.50/0.00/0.50
+[MAPPO] update   25  cost/task 2.165  shares L/E/C 0.86/0.00/0.14
+[MAPPO] update   50  cost/task 1.645  shares L/E/C 0.71/0.29/0.00
+[MAPPO] update   75  cost/task 1.645  shares L/E/C 0.67/0.33/0.00
+[MAPPO] update  100  cost/task 1.651  shares L/E/C 0.64/0.36/0.00
+[MAPPO] update  125  cost/task 1.652  shares L/E/C 0.64/0.36/0.00
+[MAPPO] update  150  cost/task 1.641  shares L/E/C 0.64/0.36/0.00
+[MAPPO] update  175  cost/task 1.645  shares L/E/C 0.66/0.34/0.00
+[MAPPO] update  200  cost/task 1.655  shares L/E/C 0.68/0.32/0.00
+[MAPPO] update  225  cost/task 1.663  shares L/E/C 0.63/0.37/0.00
+[MAPPO] update  250  cost/task 1.655  shares L/E/C 0.65/0.35/0.00
+[MAPPO] update  275  cost/task 1.635  shares L/E/C 0.64/0.36/0.00
+[MAPPO] update  300  cost/task 1.630  shares L/E/C 0.64/0.36/0.00
+[MAPPO] update  325  cost/task 1.586  shares L/E/C 0.66/0.34/0.00
+[MAPPO] update  350  cost/task 1.629  shares L/E/C 0.65/0.35/0.00
+[MAPPO] update  375  cost/task 1.598  shares L/E/C 0.67/0.33/0.00
+[MAPPO] update  399  cost/task 1.619  shares L/E/C 0.64/0.36/0.00
+price 0.00  learned: payoff -0.551 edge share 0.46 device cost 1.536 social cost 1.536
+price 0.20  learned: payoff 0.037 edge share 0.42 device cost 1.564 social cost 1.479
+price 0.40  learned: payoff 0.473 edge share 0.39 device cost 1.610 social cost 1.454
+price 0.60  learned: payoff 0.824 edge share 0.35 device cost 1.655 social cost 1.443
+price 0.80  learned: payoff 1.097 edge share 0.32 device cost 1.706 social cost 1.453
+price 1.00  learned: payoff 1.285 edge share 0.28 device cost 1.745 social cost 1.461
+price 1.20  learned: payoff 1.389 edge share 0.25 device cost 1.781 social cost 1.482
+price 1.40  learned: payoff 1.208 edge share 0.18 device cost 1.811 social cost 1.555
+price 1.60  learned: payoff 0.252 edge share 0.03 device cost 1.816 social cost 1.764
+price 1.80  learned: payoff 0.000 edge share 0.00 device cost 1.814 social cost 1.814
+price 2.00  learned: payoff 0.000 edge share 0.00 device cost 1.813 social cost 1.813
+price 2.20  learned: payoff 0.000 edge share 0.00 device cost 1.812 social cost 1.812
+price 2.40  learned: payoff 0.000 edge share 0.00 device cost 1.813 social cost 1.813
+price 2.60  learned: payoff 0.000 edge share 0.00 device cost 1.813 social cost 1.813
+price 2.80  learned: payoff 0.000 edge share 0.00 device cost 1.813 social cost 1.813
+price 3.00  learned: payoff 0.000 edge share 0.00 device cost 1.813 social cost 1.813
+{'bandit_price': 1.2, 'sweep_optimal_price': 1.2, 'bandit_share_of_plays': 0.42333333333333334, 'device_optimal_price': 0.0, 'social_optimal_price': 0.6, 'social_optimal_price_greedy': 0.8, 'congestion_weight': 0.5}

@@ -1,0 +1,420 @@
+all-local    cost/task 4.307
+all-edge     cost/task 16.445
+all-cloud    cost/task 2.691
+random       cost/task 1.927
+greedy       cost/task 1.702
+greedy+toll  cost/task 1.484
+[IQL s4] [IQL] episode     0  eps 1.00  cost/task 2.252  shares L/E/C 0.43/0.00/0.57
+[IQL s0] [IQL] episode     0  eps 1.00  cost/task 4.300  shares L/E/C 0.17/0.63/0.20
+[IQL s2] [IQL] episode     0  eps 1.00  cost/task 2.131  shares L/E/C 0.00/0.48/0.52
+[IQL s4] [IQL] episode    40  eps 0.94  cost/task 1.791  shares L/E/C 0.45/0.54/0.00
+[IQL s0] [IQL] episode    40  eps 0.94  cost/task 2.219  shares L/E/C 0.42/0.58/0.00
+[IQL s2] [IQL] episode    40  eps 0.94  cost/task 6.578  shares L/E/C 0.25/0.75/0.00
+[IQL s0] [IQL] episode    80  eps 0.87  cost/task 2.573  shares L/E/C 0.38/0.62/0.00
+[IQL s4] [IQL] episode    80  eps 0.87  cost/task 2.120  shares L/E/C 0.43/0.57/0.00
+[IQL s2] [IQL] episode    80  eps 0.87  cost/task 1.842  shares L/E/C 0.45/0.55/0.00
+[IQL s0] [IQL] episode   120  eps 0.81  cost/task 3.785  shares L/E/C 0.33/0.67/0.00
+[IQL s2] [IQL] episode   120  eps 0.81  cost/task 2.053  shares L/E/C 0.42/0.58/0.00
+[IQL s4] [IQL] episode   120  eps 0.81  cost/task 1.623  shares L/E/C 0.47/0.53/0.00
+[IQL s0] [IQL] episode   160  eps 0.75  cost/task 2.072  shares L/E/C 0.42/0.58/0.00
+[IQL s4] [IQL] episode   160  eps 0.75  cost/task 2.149  shares L/E/C 0.40/0.60/0.00
+[IQL s2] [IQL] episode   160  eps 0.75  cost/task 2.087  shares L/E/C 0.41/0.59/0.00
+[IQL s2] [IQL] episode   200  eps 0.68  cost/task 2.176  shares L/E/C 0.41/0.59/0.00
+[IQL s0] [IQL] episode   200  eps 0.68  cost/task 1.915  shares L/E/C 0.43/0.57/0.00
+[IQL s4] [IQL] episode   200  eps 0.68  cost/task 1.813  shares L/E/C 0.45/0.55/0.00
+[IQL s2] [IQL] episode   240  eps 0.62  cost/task 1.930  shares L/E/C 0.42/0.58/0.00
+[IQL s0] [IQL] episode   240  eps 0.62  cost/task 2.128  shares L/E/C 0.41/0.59/0.00
+[IQL s4] [IQL] episode   240  eps 0.62  cost/task 1.983  shares L/E/C 0.43/0.57/0.00
+[IQL s2] [IQL] episode   280  eps 0.56  cost/task 1.825  shares L/E/C 0.43/0.57/0.00
+[IQL s0] [IQL] episode   280  eps 0.56  cost/task 1.615  shares L/E/C 0.48/0.52/0.00
+[IQL s4] [IQL] episode   280  eps 0.56  cost/task 1.796  shares L/E/C 0.44/0.56/0.00
+[IQL s2] [IQL] episode   320  eps 0.49  cost/task 1.690  shares L/E/C 0.42/0.58/0.00
+[IQL s0] [IQL] episode   320  eps 0.49  cost/task 1.812  shares L/E/C 0.43/0.57/0.00
+[IQL s4] [IQL] episode   320  eps 0.49  cost/task 1.710  shares L/E/C 0.43/0.57/0.00
+[IQL s2] [IQL] episode   360  eps 0.43  cost/task 1.701  shares L/E/C 0.44/0.56/0.00
+[IQL s0] [IQL] episode   360  eps 0.43  cost/task 1.635  shares L/E/C 0.45/0.55/0.00
+[IQL s4] [IQL] episode   360  eps 0.43  cost/task 1.626  shares L/E/C 0.46/0.54/0.00
+[IQL s2] [IQL] episode   400  eps 0.37  cost/task 1.623  shares L/E/C 0.46/0.54/0.00
+[IQL s0] [IQL] episode   400  eps 0.37  cost/task 1.766  shares L/E/C 0.45/0.55/0.00
+[IQL s4] [IQL] episode   400  eps 0.37  cost/task 1.571  shares L/E/C 0.48/0.52/0.00
+[IQL s2] [IQL] episode   440  eps 0.30  cost/task 1.580  shares L/E/C 0.48/0.52/0.00
+[IQL s0] [IQL] episode   440  eps 0.30  cost/task 1.557  shares L/E/C 0.48/0.52/0.00
+[IQL s4] [IQL] episode   440  eps 0.30  cost/task 1.626  shares L/E/C 0.46/0.54/0.00
+[IQL s2] [IQL] episode   480  eps 0.24  cost/task 1.507  shares L/E/C 0.49/0.51/0.00
+[IQL s0] [IQL] episode   480  eps 0.24  cost/task 1.757  shares L/E/C 0.42/0.58/0.00
+[IQL s4] [IQL] episode   480  eps 0.24  cost/task 1.578  shares L/E/C 0.47/0.53/0.00
+[IQL s2] [IQL] episode   520  eps 0.18  cost/task 1.624  shares L/E/C 0.45/0.55/0.00
+[IQL s0] [IQL] episode   520  eps 0.18  cost/task 1.491  shares L/E/C 0.55/0.45/0.00
+[IQL s4] [IQL] episode   520  eps 0.18  cost/task 1.520  shares L/E/C 0.49/0.51/0.00
+[IQL s2] [IQL] episode   560  eps 0.11  cost/task 1.531  shares L/E/C 0.51/0.49/0.00
+[IQL s0] [IQL] episode   560  eps 0.11  cost/task 1.638  shares L/E/C 0.45/0.55/0.00
+[IQL s4] [IQL] episode   560  eps 0.11  cost/task 1.510  shares L/E/C 0.53/0.47/0.00
+[IQL s2] [IQL] episode   600  eps 0.05  cost/task 1.503  shares L/E/C 0.50/0.50/0.00
+[IQL s0] [IQL] episode   600  eps 0.05  cost/task 1.533  shares L/E/C 0.47/0.53/0.00
+[IQL s4] [IQL] episode   600  eps 0.05  cost/task 1.604  shares L/E/C 0.45/0.55/0.00
+[IQL s2] [IQL] episode   640  eps 0.05  cost/task 1.586  shares L/E/C 0.45/0.55/0.00
+[IQL s0] [IQL] episode   640  eps 0.05  cost/task 1.680  shares L/E/C 0.45/0.55/0.00
+[IQL s4] [IQL] episode   640  eps 0.05  cost/task 1.476  shares L/E/C 0.53/0.47/0.00
+[IQL s2] [IQL] episode   680  eps 0.05  cost/task 1.493  shares L/E/C 0.51/0.49/0.00
+[IQL s0] [IQL] episode   680  eps 0.05  cost/task 1.477  shares L/E/C 0.53/0.47/0.00
+[IQL s4] [IQL] episode   680  eps 0.05  cost/task 1.526  shares L/E/C 0.47/0.53/0.00
+[IQL s2] [IQL] episode   720  eps 0.05  cost/task 1.451  shares L/E/C 0.56/0.44/0.00
+[IQL s0] [IQL] episode   720  eps 0.05  cost/task 1.589  shares L/E/C 0.47/0.53/0.00
+[IQL s4] [IQL] episode   720  eps 0.05  cost/task 1.484  shares L/E/C 0.53/0.47/0.00
+[IQL s2] [IQL] episode   760  eps 0.05  cost/task 1.499  shares L/E/C 0.52/0.48/0.00
+[IQL s0] [IQL] episode   760  eps 0.05  cost/task 1.540  shares L/E/C 0.50/0.50/0.00
+[IQL s4] [IQL] episode   760  eps 0.05  cost/task 1.471  shares L/E/C 0.52/0.48/0.00
+[IQL s2] [IQL] episode   800  eps 0.05  cost/task 1.502  shares L/E/C 0.49/0.51/0.00
+[IQL s0] [IQL] episode   800  eps 0.05  cost/task 1.464  shares L/E/C 0.63/0.37/0.00
+[IQL s4] [IQL] episode   800  eps 0.05  cost/task 1.480  shares L/E/C 0.55/0.45/0.00
+[IQL s2] [IQL] episode   840  eps 0.05  cost/task 1.477  shares L/E/C 0.56/0.44/0.00
+[IQL s0] [IQL] episode   840  eps 0.05  cost/task 1.503  shares L/E/C 0.54/0.46/0.00
+[IQL s4] [IQL] episode   840  eps 0.05  cost/task 1.482  shares L/E/C 0.54/0.46/0.00
+[IQL s2] [IQL] episode   880  eps 0.05  cost/task 1.476  shares L/E/C 0.54/0.46/0.00
+[IQL s0] [IQL] episode   880  eps 0.05  cost/task 1.498  shares L/E/C 0.52/0.48/0.00
+[IQL s4] [IQL] episode   880  eps 0.05  cost/task 1.523  shares L/E/C 0.48/0.52/0.00
+[IQL s2] [IQL] episode   920  eps 0.05  cost/task 1.483  shares L/E/C 0.53/0.47/0.00
+[IQL s0] [IQL] episode   920  eps 0.05  cost/task 1.577  shares L/E/C 0.48/0.52/0.00
+[IQL s4] [IQL] episode   920  eps 0.05  cost/task 1.507  shares L/E/C 0.52/0.48/0.00
+[IQL s2] [IQL] episode   960  eps 0.05  cost/task 1.495  shares L/E/C 0.53/0.47/0.00
+[IQL s0] [IQL] episode   960  eps 0.05  cost/task 1.538  shares L/E/C 0.49/0.51/0.00
+[IQL s4] [IQL] episode   960  eps 0.05  cost/task 1.532  shares L/E/C 0.47/0.53/0.00
+[IQL s2] [IQL] episode   999  eps 0.05  cost/task 1.490  shares L/E/C 0.56/0.44/0.00
+IQL seed 2 trained in 362s
+[IQL s0] [IQL] episode   999  eps 0.05  cost/task 1.578  shares L/E/C 0.49/0.51/0.00
+IQL seed 0 trained in 363s
+[IQL s4] [IQL] episode   999  eps 0.05  cost/task 1.491  shares L/E/C 0.55/0.45/0.00
+IQL seed 4 trained in 370s
+[IQL s3] [IQL] episode     0  eps 1.00  cost/task 3.932  shares L/E/C 0.55/0.01/0.44
+[IQL s1] [IQL] episode     0  eps 1.00  cost/task 2.524  shares L/E/C 0.78/0.22/0.00
+[IPPO s0] [IPPO] update    0  cost/task 4.257  shares L/E/C 0.35/0.65/0.00
+[IQL s3] [IQL] episode    40  eps 0.94  cost/task 2.682  shares L/E/C 0.39/0.59/0.01
+[IQL s1] [IQL] episode    40  eps 0.94  cost/task 4.009  shares L/E/C 0.33/0.67/0.00
+[IQL s3] [IQL] episode    80  eps 0.87  cost/task 1.955  shares L/E/C 0.42/0.58/0.00
+[IQL s1] [IQL] episode    80  eps 0.87  cost/task 11.607  shares L/E/C 0.09/0.91/0.00
+[IQL s3] [IQL] episode   120  eps 0.81  cost/task 2.085  shares L/E/C 0.41/0.58/0.01
+[IPPO s0] [IPPO] update   16  cost/task 1.850  shares L/E/C 0.43/0.57/0.00
+[IQL s1] [IQL] episode   120  eps 0.81  cost/task 5.472  shares L/E/C 0.25/0.75/0.00
+[IQL s3] [IQL] episode   160  eps 0.75  cost/task 1.769  shares L/E/C 0.44/0.56/0.00
+[IQL s1] [IQL] episode   160  eps 0.75  cost/task 3.585  shares L/E/C 0.33/0.67/0.00
+[IQL s3] [IQL] episode   200  eps 0.68  cost/task 1.765  shares L/E/C 0.43/0.57/0.00
+[IQL s1] [IQL] episode   200  eps 0.68  cost/task 2.267  shares L/E/C 0.41/0.59/0.00
+[IPPO s0] [IPPO] update   32  cost/task 1.676  shares L/E/C 0.46/0.54/0.00
+[IQL s3] [IQL] episode   240  eps 0.62  cost/task 1.827  shares L/E/C 0.43/0.57/0.00
+[IQL s1] [IQL] episode   240  eps 0.62  cost/task 2.220  shares L/E/C 0.39/0.61/0.00
+[IQL s3] [IQL] episode   280  eps 0.56  cost/task 1.606  shares L/E/C 0.48/0.52/0.00
+[IQL s1] [IQL] episode   280  eps 0.56  cost/task 1.626  shares L/E/C 0.47/0.53/0.00
+[IQL s3] [IQL] episode   320  eps 0.49  cost/task 1.948  shares L/E/C 0.42/0.58/0.00
+[IQL s1] [IQL] episode   320  eps 0.49  cost/task 1.601  shares L/E/C 0.45/0.55/0.00
+[IPPO s0] [IPPO] update   48  cost/task 1.575  shares L/E/C 0.48/0.52/0.00
+[IQL s3] [IQL] episode   360  eps 0.43  cost/task 1.689  shares L/E/C 0.44/0.56/0.00
+[IQL s1] [IQL] episode   360  eps 0.43  cost/task 1.633  shares L/E/C 0.45/0.55/0.00
+[IQL s3] [IQL] episode   400  eps 0.37  cost/task 1.581  shares L/E/C 0.47/0.53/0.00
+[IQL s1] [IQL] episode   400  eps 0.37  cost/task 1.675  shares L/E/C 0.44/0.56/0.00
+[IPPO s0] [IPPO] update   64  cost/task 1.537  shares L/E/C 0.52/0.48/0.00
+[IQL s3] [IQL] episode   440  eps 0.30  cost/task 1.595  shares L/E/C 0.48/0.52/0.00
+[IQL s1] [IQL] episode   440  eps 0.30  cost/task 1.556  shares L/E/C 0.46/0.54/0.00
+[IQL s3] [IQL] episode   480  eps 0.24  cost/task 1.613  shares L/E/C 0.46/0.54/0.00
+[IQL s1] [IQL] episode   480  eps 0.24  cost/task 1.681  shares L/E/C 0.43/0.57/0.00
+[IQL s3] [IQL] episode   520  eps 0.18  cost/task 1.496  shares L/E/C 0.54/0.46/0.00
+[IQL s1] [IQL] episode   520  eps 0.18  cost/task 1.602  shares L/E/C 0.46/0.54/0.00
+[IPPO s0] [IPPO] update   80  cost/task 1.608  shares L/E/C 0.49/0.51/0.00
+[IQL s3] [IQL] episode   560  eps 0.11  cost/task 1.517  shares L/E/C 0.52/0.48/0.00
+[IQL s1] [IQL] episode   560  eps 0.11  cost/task 1.521  shares L/E/C 0.48/0.52/0.00
+[IQL s3] [IQL] episode   600  eps 0.05  cost/task 1.547  shares L/E/C 0.49/0.51/0.00
+[IQL s1] [IQL] episode   600  eps 0.05  cost/task 1.479  shares L/E/C 0.53/0.47/0.00
+[IPPO s0] [IPPO] update   96  cost/task 1.566  shares L/E/C 0.50/0.50/0.00
+[IQL s3] [IQL] episode   640  eps 0.05  cost/task 1.520  shares L/E/C 0.52/0.48/0.00
+[IQL s1] [IQL] episode   640  eps 0.05  cost/task 1.654  shares L/E/C 0.46/0.54/0.00
+[IQL s3] [IQL] episode   680  eps 0.05  cost/task 1.553  shares L/E/C 0.50/0.50/0.00
+[IQL s1] [IQL] episode   680  eps 0.05  cost/task 1.512  shares L/E/C 0.50/0.50/0.00
+[IQL s3] [IQL] episode   720  eps 0.05  cost/task 1.540  shares L/E/C 0.48/0.52/0.00
+[IQL s1] [IQL] episode   720  eps 0.05  cost/task 1.649  shares L/E/C 0.45/0.55/0.00
+[IPPO s0] [IPPO] update  112  cost/task 1.554  shares L/E/C 0.53/0.47/0.00
+[IQL s3] [IQL] episode   760  eps 0.05  cost/task 1.486  shares L/E/C 0.52/0.48/0.00
+[IQL s1] [IQL] episode   760  eps 0.05  cost/task 1.514  shares L/E/C 0.47/0.53/0.00
+[IQL s3] [IQL] episode   800  eps 0.05  cost/task 1.534  shares L/E/C 0.49/0.51/0.00
+[IQL s1] [IQL] episode   800  eps 0.05  cost/task 1.554  shares L/E/C 0.47/0.53/0.00
+[IPPO s0] [IPPO] update  128  cost/task 1.545  shares L/E/C 0.51/0.49/0.00
+[IQL s3] [IQL] episode   840  eps 0.05  cost/task 1.533  shares L/E/C 0.51/0.49/0.00
+[IQL s1] [IQL] episode   840  eps 0.05  cost/task 1.521  shares L/E/C 0.53/0.47/0.00
+[IQL s3] [IQL] episode   880  eps 0.05  cost/task 1.714  shares L/E/C 0.43/0.57/0.00
+[IQL s1] [IQL] episode   880  eps 0.05  cost/task 1.505  shares L/E/C 0.54/0.46/0.00
+[IQL s3] [IQL] episode   920  eps 0.05  cost/task 1.462  shares L/E/C 0.51/0.49/0.00
+[IQL s1] [IQL] episode   920  eps 0.05  cost/task 1.492  shares L/E/C 0.50/0.50/0.00
+[IPPO s0] [IPPO] update  144  cost/task 1.578  shares L/E/C 0.54/0.46/0.00
+[IQL s3] [IQL] episode   960  eps 0.05  cost/task 1.509  shares L/E/C 0.53/0.47/0.00
+[IQL s1] [IQL] episode   960  eps 0.05  cost/task 1.504  shares L/E/C 0.52/0.48/0.00
+[IQL s3] [IQL] episode   999  eps 0.05  cost/task 1.526  shares L/E/C 0.49/0.51/0.00
+IQL seed 3 trained in 312s
+[IQL s1] [IQL] episode   999  eps 0.05  cost/task 1.546  shares L/E/C 0.49/0.51/0.00
+IQL seed 1 trained in 313s
+[IPPO s1] [IPPO] update    0  cost/task 14.330  shares L/E/C 0.03/0.97/0.00
+[IPPO s3] [IPPO] update    0  cost/task 16.481  shares L/E/C 0.00/1.00/0.00
+[IPPO s0] [IPPO] update  160  cost/task 1.544  shares L/E/C 0.53/0.47/0.00
+[IPPO s1] [IPPO] update   16  cost/task 2.357  shares L/E/C 0.38/0.62/0.00
+[IPPO s3] [IPPO] update   16  cost/task 1.923  shares L/E/C 0.46/0.54/0.00
+[IPPO s0] [IPPO] update  176  cost/task 1.539  shares L/E/C 0.52/0.48/0.00
+[IPPO s1] [IPPO] update   32  cost/task 1.583  shares L/E/C 0.51/0.49/0.00
+[IPPO s3] [IPPO] update   32  cost/task 1.736  shares L/E/C 0.43/0.57/0.00
+[IPPO s0] [IPPO] update  192  cost/task 1.538  shares L/E/C 0.52/0.48/0.00
+[IPPO s1] [IPPO] update   48  cost/task 1.559  shares L/E/C 0.51/0.49/0.00
+[IPPO s3] [IPPO] update   48  cost/task 1.549  shares L/E/C 0.49/0.51/0.00
+[IPPO s0] [IPPO] update  208  cost/task 1.494  shares L/E/C 0.51/0.49/0.00
+[IPPO s1] [IPPO] update   64  cost/task 1.574  shares L/E/C 0.47/0.53/0.00
+[IPPO s3] [IPPO] update   64  cost/task 1.595  shares L/E/C 0.50/0.50/0.00
+[IPPO s0] [IPPO] update  224  cost/task 1.536  shares L/E/C 0.51/0.49/0.00
+[IPPO s1] [IPPO] update   80  cost/task 1.598  shares L/E/C 0.46/0.54/0.00
+[IPPO s3] [IPPO] update   80  cost/task 1.583  shares L/E/C 0.52/0.48/0.00
+[IPPO s0] [IPPO] update  240  cost/task 1.509  shares L/E/C 0.56/0.44/0.00
+[IPPO s1] [IPPO] update   96  cost/task 1.543  shares L/E/C 0.49/0.51/0.00
+[IPPO s3] [IPPO] update   96  cost/task 1.612  shares L/E/C 0.48/0.52/0.00
+[IPPO s0] [IPPO] update  256  cost/task 1.497  shares L/E/C 0.56/0.44/0.00
+[IPPO s1] [IPPO] update  112  cost/task 1.584  shares L/E/C 0.49/0.51/0.00
+[IPPO s3] [IPPO] update  112  cost/task 1.564  shares L/E/C 0.49/0.51/0.00
+[IPPO s0] [IPPO] update  272  cost/task 1.485  shares L/E/C 0.56/0.44/0.00
+[IPPO s1] [IPPO] update  128  cost/task 1.533  shares L/E/C 0.52/0.48/0.00
+[IPPO s3] [IPPO] update  128  cost/task 1.581  shares L/E/C 0.50/0.50/0.00
+[IPPO s0] [IPPO] update  288  cost/task 1.484  shares L/E/C 0.54/0.46/0.00
+[IPPO s1] [IPPO] update  144  cost/task 1.553  shares L/E/C 0.52/0.48/0.00
+[IPPO s3] [IPPO] update  144  cost/task 1.527  shares L/E/C 0.51/0.49/0.00
+[IPPO s0] [IPPO] update  304  cost/task 1.464  shares L/E/C 0.55/0.45/0.00
+[IPPO s1] [IPPO] update  160  cost/task 1.559  shares L/E/C 0.49/0.51/0.00
+[IPPO s3] [IPPO] update  160  cost/task 1.504  shares L/E/C 0.55/0.45/0.00
+[IPPO s0] [IPPO] update  320  cost/task 1.482  shares L/E/C 0.56/0.44/0.00
+[IPPO s1] [IPPO] update  176  cost/task 1.546  shares L/E/C 0.51/0.49/0.00
+[IPPO s3] [IPPO] update  176  cost/task 1.536  shares L/E/C 0.55/0.45/0.00
+[IPPO s0] [IPPO] update  336  cost/task 1.502  shares L/E/C 0.54/0.46/0.00
+[IPPO s1] [IPPO] update  192  cost/task 1.562  shares L/E/C 0.50/0.50/0.00
+[IPPO s3] [IPPO] update  192  cost/task 1.506  shares L/E/C 0.52/0.48/0.00
+[IPPO s0] [IPPO] update  352  cost/task 1.521  shares L/E/C 0.54/0.46/0.00
+[IPPO s1] [IPPO] update  208  cost/task 1.572  shares L/E/C 0.54/0.46/0.00
+[IPPO s3] [IPPO] update  208  cost/task 1.514  shares L/E/C 0.55/0.45/0.00
+[IPPO s0] [IPPO] update  368  cost/task 1.496  shares L/E/C 0.55/0.45/0.00
+[IPPO s1] [IPPO] update  224  cost/task 1.515  shares L/E/C 0.54/0.46/0.00
+[IPPO s3] [IPPO] update  224  cost/task 1.517  shares L/E/C 0.50/0.50/0.00
+[IPPO s0] [IPPO] update  384  cost/task 1.489  shares L/E/C 0.55/0.45/0.00
+[IPPO s1] [IPPO] update  240  cost/task 1.511  shares L/E/C 0.54/0.46/0.00
+[IPPO s0] [IPPO] update  399  cost/task 1.452  shares L/E/C 0.56/0.44/0.00
+IPPO seed 0 trained in 771s
+[IPPO s3] [IPPO] update  240  cost/task 1.501  shares L/E/C 0.54/0.46/0.00
+[MAPPO s0] [MAPPO] update    0  cost/task 4.987  shares L/E/C 0.34/0.66/0.00
+[IPPO s1] [IPPO] update  256  cost/task 1.533  shares L/E/C 0.51/0.49/0.00
+[IPPO s3] [IPPO] update  256  cost/task 1.556  shares L/E/C 0.51/0.49/0.00
+[MAPPO s0] [MAPPO] update   16  cost/task 1.888  shares L/E/C 0.48/0.52/0.00
+[IPPO s1] [IPPO] update  272  cost/task 1.498  shares L/E/C 0.55/0.45/0.00
+[IPPO s3] [IPPO] update  272  cost/task 1.516  shares L/E/C 0.51/0.49/0.00
+[MAPPO s0] [MAPPO] update   32  cost/task 1.698  shares L/E/C 0.48/0.52/0.00
+[IPPO s1] [IPPO] update  288  cost/task 1.499  shares L/E/C 0.54/0.46/0.00
+[IPPO s3] [IPPO] update  288  cost/task 1.526  shares L/E/C 0.52/0.48/0.00
+[MAPPO s0] [MAPPO] update   48  cost/task 1.550  shares L/E/C 0.54/0.46/0.00
+[IPPO s1] [IPPO] update  304  cost/task 1.515  shares L/E/C 0.52/0.48/0.00
+[IPPO s3] [IPPO] update  304  cost/task 1.525  shares L/E/C 0.51/0.49/0.00
+[MAPPO s0] [MAPPO] update   64  cost/task 1.577  shares L/E/C 0.51/0.49/0.00
+[IPPO s1] [IPPO] update  320  cost/task 1.495  shares L/E/C 0.51/0.49/0.00
+[IPPO s3] [IPPO] update  320  cost/task 1.517  shares L/E/C 0.50/0.50/0.00
+[MAPPO s0] [MAPPO] update   80  cost/task 1.605  shares L/E/C 0.50/0.50/0.00
+[IPPO s1] [IPPO] update  336  cost/task 1.537  shares L/E/C 0.52/0.48/0.00
+[IPPO s3] [IPPO] update  336  cost/task 1.513  shares L/E/C 0.54/0.46/0.00
+[MAPPO s0] [MAPPO] update   96  cost/task 1.579  shares L/E/C 0.46/0.54/0.00
+[IPPO s1] [IPPO] update  352  cost/task 1.496  shares L/E/C 0.53/0.47/0.00
+[IPPO s3] [IPPO] update  352  cost/task 1.481  shares L/E/C 0.53/0.47/0.00
+[MAPPO s0] [MAPPO] update  112  cost/task 1.572  shares L/E/C 0.47/0.53/0.00
+[IPPO s1] [IPPO] update  368  cost/task 1.491  shares L/E/C 0.54/0.46/0.00
+[IPPO s3] [IPPO] update  368  cost/task 1.523  shares L/E/C 0.52/0.48/0.00
+[MAPPO s0] [MAPPO] update  128  cost/task 1.575  shares L/E/C 0.48/0.52/0.00
+[IPPO s1] [IPPO] update  384  cost/task 1.503  shares L/E/C 0.54/0.46/0.00
+[IPPO s3] [IPPO] update  384  cost/task 1.523  shares L/E/C 0.51/0.49/0.00
+[MAPPO s0] [MAPPO] update  144  cost/task 1.521  shares L/E/C 0.52/0.48/0.00
+[IPPO s1] [IPPO] update  399  cost/task 1.500  shares L/E/C 0.54/0.46/0.00
+IPPO seed 1 trained in 687s
+[IPPO s3] [IPPO] update  399  cost/task 1.508  shares L/E/C 0.55/0.45/0.00
+IPPO seed 3 trained in 690s
+[IPPO s2] [IPPO] update    0  cost/task 4.478  shares L/E/C 0.00/0.66/0.34
+[IPPO s4] [IPPO] update    0  cost/task 3.612  shares L/E/C 0.97/0.03/0.00
+[MAPPO s0] [MAPPO] update  160  cost/task 1.527  shares L/E/C 0.48/0.52/0.00
+[IPPO s2] [IPPO] update   16  cost/task 1.692  shares L/E/C 0.46/0.54/0.00
+[IPPO s4] [IPPO] update   16  cost/task 2.731  shares L/E/C 0.36/0.64/0.00
+[MAPPO s0] [MAPPO] update  176  cost/task 1.548  shares L/E/C 0.50/0.50/0.00
+[IPPO s2] [IPPO] update   32  cost/task 1.563  shares L/E/C 0.50/0.50/0.00
+[IPPO s4] [IPPO] update   32  cost/task 1.641  shares L/E/C 0.52/0.48/0.00
+[MAPPO s0] [MAPPO] update  192  cost/task 1.496  shares L/E/C 0.52/0.48/0.00
+[IPPO s2] [IPPO] update   48  cost/task 1.608  shares L/E/C 0.48/0.52/0.00
+[IPPO s4] [IPPO] update   48  cost/task 1.631  shares L/E/C 0.49/0.51/0.00
+[MAPPO s0] [MAPPO] update  208  cost/task 1.535  shares L/E/C 0.50/0.50/0.00
+[IPPO s2] [IPPO] update   64  cost/task 1.563  shares L/E/C 0.51/0.49/0.00
+[IPPO s4] [IPPO] update   64  cost/task 1.612  shares L/E/C 0.49/0.51/0.00
+[MAPPO s0] [MAPPO] update  224  cost/task 1.550  shares L/E/C 0.49/0.51/0.00
+[IPPO s2] [IPPO] update   80  cost/task 1.574  shares L/E/C 0.48/0.52/0.00
+[IPPO s4] [IPPO] update   80  cost/task 1.616  shares L/E/C 0.51/0.49/0.00
+[MAPPO s0] [MAPPO] update  240  cost/task 1.499  shares L/E/C 0.52/0.48/0.00
+[IPPO s2] [IPPO] update   96  cost/task 1.605  shares L/E/C 0.48/0.52/0.00
+[IPPO s4] [IPPO] update   96  cost/task 1.558  shares L/E/C 0.52/0.48/0.00
+[IPPO s2] [IPPO] update  112  cost/task 1.605  shares L/E/C 0.52/0.48/0.00
+[MAPPO s0] [MAPPO] update  256  cost/task 1.541  shares L/E/C 0.52/0.48/0.00
+[IPPO s4] [IPPO] update  112  cost/task 1.576  shares L/E/C 0.53/0.47/0.00
+[IPPO s2] [IPPO] update  128  cost/task 1.599  shares L/E/C 0.49/0.51/0.00
+[MAPPO s0] [MAPPO] update  272  cost/task 1.539  shares L/E/C 0.48/0.52/0.00
+[IPPO s4] [IPPO] update  128  cost/task 1.564  shares L/E/C 0.52/0.48/0.00
+[IPPO s2] [IPPO] update  144  cost/task 1.582  shares L/E/C 0.49/0.51/0.00
+[MAPPO s0] [MAPPO] update  288  cost/task 1.496  shares L/E/C 0.52/0.48/0.00
+[IPPO s4] [IPPO] update  144  cost/task 1.563  shares L/E/C 0.50/0.50/0.00
+[IPPO s2] [IPPO] update  160  cost/task 1.559  shares L/E/C 0.54/0.46/0.00
+[MAPPO s0] [MAPPO] update  304  cost/task 1.526  shares L/E/C 0.53/0.47/0.00
+[IPPO s4] [IPPO] update  160  cost/task 1.559  shares L/E/C 0.53/0.47/0.00
+[IPPO s2] [IPPO] update  176  cost/task 1.546  shares L/E/C 0.54/0.46/0.00
+[MAPPO s0] [MAPPO] update  320  cost/task 1.489  shares L/E/C 0.52/0.48/0.00
+[IPPO s4] [IPPO] update  176  cost/task 1.540  shares L/E/C 0.53/0.47/0.00
+[IPPO s2] [IPPO] update  192  cost/task 1.557  shares L/E/C 0.52/0.48/0.00
+[IPPO s4] [IPPO] update  192  cost/task 1.519  shares L/E/C 0.54/0.46/0.00
+[MAPPO s0] [MAPPO] update  336  cost/task 1.584  shares L/E/C 0.49/0.51/0.00
+[IPPO s2] [IPPO] update  208  cost/task 1.496  shares L/E/C 0.56/0.44/0.00
+[IPPO s4] [IPPO] update  208  cost/task 1.531  shares L/E/C 0.54/0.46/0.00
+[MAPPO s0] [MAPPO] update  352  cost/task 1.503  shares L/E/C 0.53/0.47/0.00
+[IPPO s2] [IPPO] update  224  cost/task 1.532  shares L/E/C 0.56/0.44/0.00
+[IPPO s4] [IPPO] update  224  cost/task 1.514  shares L/E/C 0.53/0.47/0.00
+[MAPPO s0] [MAPPO] update  368  cost/task 1.530  shares L/E/C 0.53/0.47/0.00
+[IPPO s2] [IPPO] update  240  cost/task 1.495  shares L/E/C 0.55/0.45/0.00
+[IPPO s4] [IPPO] update  240  cost/task 1.486  shares L/E/C 0.55/0.45/0.00
+[MAPPO s0] [MAPPO] update  384  cost/task 1.521  shares L/E/C 0.55/0.45/0.00
+[IPPO s2] [IPPO] update  256  cost/task 1.487  shares L/E/C 0.56/0.44/0.00
+[IPPO s4] [IPPO] update  256  cost/task 1.501  shares L/E/C 0.55/0.45/0.00
+[MAPPO s0] [MAPPO] update  399  cost/task 1.518  shares L/E/C 0.55/0.45/0.00
+MAPPO seed 0 trained in 701s
+[MAPPO s1] [MAPPO] update    0  cost/task 8.918  shares L/E/C 0.13/0.87/0.00
+[IPPO s2] [IPPO] update  272  cost/task 1.473  shares L/E/C 0.56/0.44/0.00
+[IPPO s4] [IPPO] update  272  cost/task 1.517  shares L/E/C 0.53/0.47/0.00
+[MAPPO s1] [MAPPO] update   16  cost/task 1.857  shares L/E/C 0.43/0.57/0.00
+[IPPO s2] [IPPO] update  288  cost/task 1.507  shares L/E/C 0.52/0.48/0.00
+[IPPO s4] [IPPO] update  288  cost/task 1.533  shares L/E/C 0.52/0.48/0.00
+[MAPPO s1] [MAPPO] update   32  cost/task 1.667  shares L/E/C 0.45/0.55/0.00
+[IPPO s2] [IPPO] update  304  cost/task 1.528  shares L/E/C 0.52/0.48/0.00
+[IPPO s4] [IPPO] update  304  cost/task 1.516  shares L/E/C 0.55/0.45/0.00
+[MAPPO s1] [MAPPO] update   48  cost/task 1.597  shares L/E/C 0.48/0.52/0.00
+[IPPO s2] [IPPO] update  320  cost/task 1.513  shares L/E/C 0.57/0.43/0.00
+[IPPO s4] [IPPO] update  320  cost/task 1.469  shares L/E/C 0.53/0.47/0.00
+[MAPPO s1] [MAPPO] update   64  cost/task 1.624  shares L/E/C 0.47/0.53/0.00
+[IPPO s2] [IPPO] update  336  cost/task 1.476  shares L/E/C 0.58/0.42/0.00
+[IPPO s4] [IPPO] update  336  cost/task 1.464  shares L/E/C 0.57/0.43/0.00
+[IPPO s2] [IPPO] update  352  cost/task 1.501  shares L/E/C 0.56/0.44/0.00
+[MAPPO s1] [MAPPO] update   80  cost/task 1.636  shares L/E/C 0.46/0.54/0.00
+[IPPO s4] [IPPO] update  352  cost/task 1.501  shares L/E/C 0.55/0.45/0.00
+[IPPO s2] [IPPO] update  368  cost/task 1.515  shares L/E/C 0.51/0.49/0.00
+[MAPPO s1] [MAPPO] update   96  cost/task 1.582  shares L/E/C 0.51/0.49/0.00
+[IPPO s4] [IPPO] update  368  cost/task 1.471  shares L/E/C 0.54/0.46/0.00
+[IPPO s2] [IPPO] update  384  cost/task 1.481  shares L/E/C 0.53/0.47/0.00
+[MAPPO s1] [MAPPO] update  112  cost/task 1.594  shares L/E/C 0.49/0.51/0.00
+[IPPO s4] [IPPO] update  384  cost/task 1.513  shares L/E/C 0.51/0.49/0.00
+[IPPO s2] [IPPO] update  399  cost/task 1.474  shares L/E/C 0.54/0.46/0.00
+IPPO seed 2 trained in 756s
+[MAPPO s1] [MAPPO] update  128  cost/task 1.572  shares L/E/C 0.53/0.47/0.00
+[IPPO s4] [IPPO] update  399  cost/task 1.488  shares L/E/C 0.55/0.45/0.00
+IPPO seed 4 trained in 762s
+[MAPPO s2] [MAPPO] update    0  cost/task 4.400  shares L/E/C 0.00/0.66/0.34
+[MAPPO s4] [MAPPO] update    0  cost/task 16.481  shares L/E/C 0.00/1.00/0.00
+[MAPPO s1] [MAPPO] update  144  cost/task 1.593  shares L/E/C 0.52/0.48/0.00
+[MAPPO s2] [MAPPO] update   16  cost/task 1.903  shares L/E/C 0.39/0.61/0.00
+[MAPPO s4] [MAPPO] update   16  cost/task 2.634  shares L/E/C 0.39/0.61/0.00
+[MAPPO s1] [MAPPO] update  160  cost/task 1.593  shares L/E/C 0.54/0.46/0.00
+[MAPPO s2] [MAPPO] update   32  cost/task 1.697  shares L/E/C 0.44/0.56/0.00
+[MAPPO s4] [MAPPO] update   32  cost/task 1.556  shares L/E/C 0.53/0.47/0.00
+[MAPPO s1] [MAPPO] update  176  cost/task 1.560  shares L/E/C 0.52/0.48/0.00
+[MAPPO s2] [MAPPO] update   48  cost/task 1.664  shares L/E/C 0.45/0.55/0.00
+[MAPPO s4] [MAPPO] update   48  cost/task 1.693  shares L/E/C 0.45/0.55/0.00
+[MAPPO s1] [MAPPO] update  192  cost/task 1.557  shares L/E/C 0.53/0.47/0.00
+[MAPPO s2] [MAPPO] update   64  cost/task 1.582  shares L/E/C 0.48/0.52/0.00
+[MAPPO s4] [MAPPO] update   64  cost/task 1.588  shares L/E/C 0.48/0.52/0.00
+[MAPPO s1] [MAPPO] update  208  cost/task 1.523  shares L/E/C 0.53/0.47/0.00
+[MAPPO s2] [MAPPO] update   80  cost/task 1.623  shares L/E/C 0.45/0.55/0.00
+[MAPPO s4] [MAPPO] update   80  cost/task 1.539  shares L/E/C 0.49/0.51/0.00
+[MAPPO s1] [MAPPO] update  224  cost/task 1.545  shares L/E/C 0.51/0.49/0.00
+[MAPPO s2] [MAPPO] update   96  cost/task 1.567  shares L/E/C 0.50/0.50/0.00
+[MAPPO s4] [MAPPO] update   96  cost/task 1.591  shares L/E/C 0.54/0.46/0.00
+[MAPPO s1] [MAPPO] update  240  cost/task 1.568  shares L/E/C 0.51/0.49/0.00
+[MAPPO s2] [MAPPO] update  112  cost/task 1.554  shares L/E/C 0.51/0.49/0.00
+[MAPPO s4] [MAPPO] update  112  cost/task 1.551  shares L/E/C 0.52/0.48/0.00
+[MAPPO s1] [MAPPO] update  256  cost/task 1.566  shares L/E/C 0.50/0.50/0.00
+[MAPPO s2] [MAPPO] update  128  cost/task 1.561  shares L/E/C 0.50/0.50/0.00
+[MAPPO s4] [MAPPO] update  128  cost/task 1.576  shares L/E/C 0.50/0.50/0.00
+[MAPPO s1] [MAPPO] update  272  cost/task 1.550  shares L/E/C 0.51/0.49/0.00
+[MAPPO s2] [MAPPO] update  144  cost/task 1.568  shares L/E/C 0.51/0.49/0.00
+[MAPPO s4] [MAPPO] update  144  cost/task 1.542  shares L/E/C 0.53/0.47/0.00
+[MAPPO s1] [MAPPO] update  288  cost/task 1.488  shares L/E/C 0.53/0.47/0.00
+[MAPPO s2] [MAPPO] update  160  cost/task 1.564  shares L/E/C 0.51/0.49/0.00
+[MAPPO s4] [MAPPO] update  160  cost/task 1.550  shares L/E/C 0.52/0.48/0.00
+[MAPPO s1] [MAPPO] update  304  cost/task 1.524  shares L/E/C 0.54/0.46/0.00
+[MAPPO s2] [MAPPO] update  176  cost/task 1.498  shares L/E/C 0.53/0.47/0.00
+[MAPPO s4] [MAPPO] update  176  cost/task 1.573  shares L/E/C 0.53/0.47/0.00
+[MAPPO s1] [MAPPO] update  320  cost/task 1.509  shares L/E/C 0.54/0.46/0.00
+[MAPPO s2] [MAPPO] update  192  cost/task 1.541  shares L/E/C 0.54/0.46/0.00
+[MAPPO s4] [MAPPO] update  192  cost/task 1.528  shares L/E/C 0.52/0.48/0.00
+[MAPPO s1] [MAPPO] update  336  cost/task 1.522  shares L/E/C 0.51/0.49/0.00
+[MAPPO s2] [MAPPO] update  208  cost/task 1.511  shares L/E/C 0.53/0.47/0.00
+[MAPPO s4] [MAPPO] update  208  cost/task 1.538  shares L/E/C 0.54/0.46/0.00
+[MAPPO s1] [MAPPO] update  352  cost/task 1.533  shares L/E/C 0.53/0.47/0.00
+[MAPPO s2] [MAPPO] update  224  cost/task 1.512  shares L/E/C 0.57/0.43/0.00
+[MAPPO s4] [MAPPO] update  224  cost/task 1.546  shares L/E/C 0.53/0.47/0.00
+[MAPPO s1] [MAPPO] update  368  cost/task 1.509  shares L/E/C 0.52/0.48/0.00
+[MAPPO s2] [MAPPO] update  240  cost/task 1.527  shares L/E/C 0.56/0.44/0.00
+[MAPPO s4] [MAPPO] update  240  cost/task 1.493  shares L/E/C 0.56/0.44/0.00
+[MAPPO s1] [MAPPO] update  384  cost/task 1.528  shares L/E/C 0.51/0.49/0.00
+[MAPPO s2] [MAPPO] update  256  cost/task 1.557  shares L/E/C 0.51/0.49/0.00
+[MAPPO s4] [MAPPO] update  256  cost/task 1.539  shares L/E/C 0.51/0.49/0.00
+[MAPPO s1] [MAPPO] update  399  cost/task 1.491  shares L/E/C 0.54/0.46/0.00
+MAPPO seed 1 trained in 785s
+[MAPPO s2] [MAPPO] update  272  cost/task 1.554  shares L/E/C 0.48/0.52/0.00
+[MAPPO s4] [MAPPO] update  272  cost/task 1.483  shares L/E/C 0.55/0.45/0.00
+[MAPPO s2] [MAPPO] update  288  cost/task 1.487  shares L/E/C 0.53/0.47/0.00
+[MAPPO s4] [MAPPO] update  288  cost/task 1.498  shares L/E/C 0.54/0.46/0.00
+[MAPPO s2] [MAPPO] update  304  cost/task 1.505  shares L/E/C 0.53/0.47/0.00
+[MAPPO s4] [MAPPO] update  304  cost/task 1.474  shares L/E/C 0.55/0.45/0.00
+[MAPPO s2] [MAPPO] update  320  cost/task 1.511  shares L/E/C 0.54/0.46/0.00
+[MAPPO s4] [MAPPO] update  320  cost/task 1.493  shares L/E/C 0.57/0.43/0.00
+[MAPPO s2] [MAPPO] update  336  cost/task 1.516  shares L/E/C 0.53/0.47/0.00
+[MAPPO s4] [MAPPO] update  336  cost/task 1.488  shares L/E/C 0.56/0.44/0.00
+[MAPPO s2] [MAPPO] update  352  cost/task 1.504  shares L/E/C 0.52/0.48/0.00
+[MAPPO s4] [MAPPO] update  352  cost/task 1.492  shares L/E/C 0.56/0.44/0.00
+[MAPPO s2] [MAPPO] update  368  cost/task 1.514  shares L/E/C 0.53/0.47/0.00
+[MAPPO s4] [MAPPO] update  368  cost/task 1.504  shares L/E/C 0.57/0.43/0.00
+[MAPPO s2] [MAPPO] update  384  cost/task 1.491  shares L/E/C 0.53/0.47/0.00
+[MAPPO s4] [MAPPO] update  384  cost/task 1.495  shares L/E/C 0.50/0.50/0.00
+[MAPPO s2] [MAPPO] update  399  cost/task 1.506  shares L/E/C 0.50/0.50/0.00
+MAPPO seed 2 trained in 763s
+[MAPPO s3] [MAPPO] update    0  cost/task 16.481  shares L/E/C 0.00/1.00/0.00
+[MAPPO s4] [MAPPO] update  399  cost/task 1.472  shares L/E/C 0.54/0.46/0.00
+MAPPO seed 4 trained in 770s
+[MAPPO s3] [MAPPO] update   16  cost/task 1.806  shares L/E/C 0.45/0.55/0.00
+[MAPPO s3] [MAPPO] update   32  cost/task 1.695  shares L/E/C 0.46/0.54/0.00
+[MAPPO s3] [MAPPO] update   48  cost/task 1.746  shares L/E/C 0.44/0.56/0.00
+[MAPPO s3] [MAPPO] update   64  cost/task 1.606  shares L/E/C 0.46/0.54/0.00
+[MAPPO s3] [MAPPO] update   80  cost/task 1.584  shares L/E/C 0.48/0.52/0.00
+[MAPPO s3] [MAPPO] update   96  cost/task 1.592  shares L/E/C 0.51/0.49/0.00
+[MAPPO s3] [MAPPO] update  112  cost/task 1.564  shares L/E/C 0.52/0.48/0.00
+[MAPPO s3] [MAPPO] update  128  cost/task 1.546  shares L/E/C 0.52/0.48/0.00
+[MAPPO s3] [MAPPO] update  144  cost/task 1.520  shares L/E/C 0.51/0.49/0.00
+[MAPPO s3] [MAPPO] update  160  cost/task 1.581  shares L/E/C 0.50/0.50/0.00
+[MAPPO s3] [MAPPO] update  176  cost/task 1.541  shares L/E/C 0.50/0.50/0.00
+[MAPPO s3] [MAPPO] update  192  cost/task 1.539  shares L/E/C 0.52/0.48/0.00
+[MAPPO s3] [MAPPO] update  208  cost/task 1.549  shares L/E/C 0.50/0.50/0.00
+[MAPPO s3] [MAPPO] update  224  cost/task 1.527  shares L/E/C 0.51/0.49/0.00
+[MAPPO s3] [MAPPO] update  240  cost/task 1.539  shares L/E/C 0.50/0.50/0.00
+[MAPPO s3] [MAPPO] update  256  cost/task 1.525  shares L/E/C 0.50/0.50/0.00
+[MAPPO s3] [MAPPO] update  272  cost/task 1.518  shares L/E/C 0.51/0.49/0.00
+[MAPPO s3] [MAPPO] update  288  cost/task 1.541  shares L/E/C 0.54/0.46/0.00
+[MAPPO s3] [MAPPO] update  304  cost/task 1.530  shares L/E/C 0.52/0.48/0.00
+[MAPPO s3] [MAPPO] update  320  cost/task 1.490  shares L/E/C 0.52/0.48/0.00
+[MAPPO s3] [MAPPO] update  336  cost/task 1.504  shares L/E/C 0.55/0.45/0.00
+[MAPPO s3] [MAPPO] update  352  cost/task 1.537  shares L/E/C 0.53/0.47/0.00
+[MAPPO s3] [MAPPO] update  368  cost/task 1.538  shares L/E/C 0.48/0.52/0.00
+[MAPPO s3] [MAPPO] update  384  cost/task 1.501  shares L/E/C 0.54/0.46/0.00
+[MAPPO s3] [MAPPO] update  399  cost/task 1.532  shares L/E/C 0.50/0.50/0.00
+MAPPO seed 3 trained in 695s
+all-local    4.307
+all-edge     16.445
+all-cloud    2.691
+random       1.927
+greedy       1.702
+greedy+toll  1.484
+IQL          1.529 ± 0.052
+IPPO         1.492 ± 0.018
+MAPPO        1.526 ± 0.033
